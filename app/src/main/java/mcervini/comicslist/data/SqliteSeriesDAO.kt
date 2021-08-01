@@ -6,8 +6,6 @@ import android.database.Cursor
 import mcervini.comicslist.Availability
 import mcervini.comicslist.Comic
 import mcervini.comicslist.Series
-import java.lang.IllegalArgumentException
-import java.lang.IllegalStateException
 import java.util.*
 
 class SqliteSeriesDAO(val context: Context) : SeriesDAO {
