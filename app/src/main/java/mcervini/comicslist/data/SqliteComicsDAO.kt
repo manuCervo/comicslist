@@ -44,7 +44,7 @@ class SqliteComicsDAO(private val context: Context) : ComicsDAO {
         values.put("series_id", comic.series.id.toString())
         values.put("number", comic.number)
         values.put("title", comic.title)
-        values.put("availability", comic.availability.v)
+        values.put("availability", comic.availability.value)
         return values
     }
 }

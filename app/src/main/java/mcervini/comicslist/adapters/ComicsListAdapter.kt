@@ -4,7 +4,6 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import mcervini.comicslist.Availability
 import mcervini.comicslist.Comic
 import mcervini.comicslist.R
 
@@ -27,11 +26,7 @@ class ComicsListAdapter(private val list: MutableList<Comic>) : RecyclerView.Ada
         }
 
         holder.numberTextView.text = "${comic.number}"
-        holder.availabilityImageView.setColorFilter(context.getColor(when (comic.availability) {
-            Availability.AVAILABLE -> R.color.comic_available
-            Availability.NOT_AVAILABLE -> R.color.comic_missing
-            Availability.BOOKED -> R.color.comic_booked
-        }))
+        holder.availabilityImageView.setColorFilter(context.getColor(comic.availability.colorRes))
     }
 
     override fun getItemCount(): Int {

@@ -2,26 +2,43 @@ package mcervini.comicslist
 
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_list.*
 import mcervini.comicslist.adapters.SeriesListAdapter
-import mcervini.comicslist.data.SeriesDAO
 import mcervini.comicslist.data.SqliteSeriesDAO
 
 class ListActivity : AppCompatActivity() {
+    lateinit var list: MutableList<Series>
+    lateinit var seriesDAO: SqliteSeriesDAO
+    lateinit var seriesListAdapter: SeriesListAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
-        val seriesDao: SeriesDAO = SqliteSeriesDAO(applicationContext)
+        seriesDAO = SqliteSeriesDAO(applicationContext)
+        list = seriesDAO.getAllSeries()
+        seriesListAdapter = SeriesListAdapter(list)
 
-        val adapter: SeriesListAdapter = SeriesListAdapter(seriesDao.getAllSeries())
-
-        comicsRecyclerView.adapter = adapter
+        comicsRecyclerView.adapter = seriesListAdapter
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.list_menu, menu)
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menu_add -> NewSeriesDialogFragment(onNewSeriesEntered).show(supportFragmentManager, "dialog")
+        }
+        return true
+    }
+
+    private val onNewSeriesEntered: (String, Int, Availability) -> Unit = { name, numberOfComics, availability ->
+        val newSeries: Series = seriesDAO.createNewSeries(name, numberOfComics, availability)
+        list.add(newSeries)
+        seriesListAdapter.notifyDataSetChanged()
     }
 }
