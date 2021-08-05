@@ -7,6 +7,10 @@ import androidx.recyclerview.widget.RecyclerView
 import mcervini.comicslist.R
 
 class ComicsListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    init {
+        view.isLongClickable = true
+    }
+
     val titleTextView: TextView = view.findViewById(R.id.comicTitleTextView)
     val numberTextView: TextView = view.findViewById(R.id.comicNumberTextView)
     val availabilityImageView: ImageView = view.findViewById(R.id.availabilityImageView)

@@ -16,6 +16,7 @@ class SeriesViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     private val expandImageResource = R.drawable.ic_round_expand_more_24
 
     init {
+        view.isLongClickable = true
         expandButton.setOnClickListener {
 
             comicsRecyclerView.visibility = if (comicsRecyclerView.visibility == VISIBLE) {

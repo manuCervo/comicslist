@@ -1,7 +1,6 @@
 package mcervini.comicslist.adapters
 
 import android.view.LayoutInflater
-
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import mcervini.comicslist.R
@@ -24,5 +23,6 @@ class SeriesListAdapter(private val list: MutableList<Series>) : RecyclerView.Ad
         val series: Series = list[position]
         holder.seriesNameTextView.text = series.name
         holder.comicsRecyclerView.adapter = ComicsListAdapter(series.comics)
+
     }
 }
