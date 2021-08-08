@@ -1,30 +1,39 @@
 package mcervini.comicslist
 
 import android.os.Bundle
-import android.util.Log
 import android.view.ContextMenu
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_list.*
 import mcervini.comicslist.adapters.SeriesListAdapter
+import mcervini.comicslist.data.SqliteComicsDAO
 import mcervini.comicslist.data.SqliteSeriesDAO
 
 class ListActivity : AppCompatActivity() {
     lateinit var list: MutableList<Series>
     lateinit var seriesDAO: SqliteSeriesDAO
     lateinit var seriesListAdapter: SeriesListAdapter
+    lateinit var comicsDAO: SqliteComicsDAO
+    lateinit var listUpdater: ListUpdater
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
         seriesDAO = SqliteSeriesDAO(applicationContext)
+        comicsDAO = SqliteComicsDAO(applicationContext)
+
         list = seriesDAO.getAllSeries()
         seriesListAdapter = SeriesListAdapter(list)
 
         comicsRecyclerView.adapter = seriesListAdapter
+
+
+        listUpdater = ListUpdater(seriesDAO, comicsDAO, seriesListAdapter, list)
+
         registerForContextMenu(comicsRecyclerView)
     }
 
@@ -41,9 +50,7 @@ class ListActivity : AppCompatActivity() {
     }
 
     private val onNewSeriesEntered: (String, Int, Availability) -> Unit = { name, numberOfComics, availability ->
-        val newSeries: Series = seriesDAO.createNewSeries(name, numberOfComics, availability)
-        list.add(newSeries)
-        seriesListAdapter.notifyDataSetChanged()
+        listUpdater.createSeries(name, numberOfComics, availability)
     }
 
     override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
@@ -60,9 +67,37 @@ class ListActivity : AppCompatActivity() {
             null
         }
 
-        Log.e("series", series.toString())
-        Log.e("comic", comic.toString())
-
+        when (item.itemId) {
+            R.id.menu_delete -> {
+                val dialog: AlertDialog = AlertDialog.Builder(this)
+                        .setTitle("elimina")
+                        .setMessage("eliminare ${
+                            if (comic != null) {
+                                "fumetto"
+                            } else {
+                                "serie"
+                            }
+                        }?")
+                        .setNegativeButton("no") { dialog, _ -> dialog.dismiss() }
+                        .setPositiveButton("sì") { dialog, _ ->
+                            if (comic != null) {
+                                listUpdater.deleteComic(comic)
+                            } else {
+                                listUpdater.deleteSeries(series)
+                            }
+                        }
+                        .create()
+                dialog.show()
+            }
+            R.id.menu_edit -> {
+                if (comic == null) {
+                    EditSeriesDialogFragment(series) { newName: String ->
+                        series.name = newName
+                        listUpdater.updateSeries(series)
+                    }.show(supportFragmentManager, "editDialog")
+                }
+            }
+        }
         return true
     }
 }
