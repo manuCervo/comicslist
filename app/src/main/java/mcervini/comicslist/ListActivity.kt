@@ -54,7 +54,11 @@ class ListActivity : AppCompatActivity() {
     }
 
     override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
-        menuInflater.inflate(R.menu.series_context_menu, menu)
+        val info = menuInfo as SeriesRecyclerView.ContextMenuInfo
+        menuInflater.inflate(R.menu.modify_delete_context_menu, menu)
+        if (info.nestedPosition == -1) {
+            menuInflater.inflate(R.menu.series_context_menu, menu)
+        }
     }
 
     override fun onContextItemSelected(item: MenuItem): Boolean {
@@ -106,6 +110,10 @@ class ListActivity : AppCompatActivity() {
                     }.show(supportFragmentManager, "editDialog")
                 }
             }
+            R.id.menu_new_comic ->
+                NewComicDialogFragment(series) { number: Int, title: String, availability: Availability ->
+                    listUpdater.createComic(series, number, title, availability)
+                }.show(supportFragmentManager, "newComic")
         }
         return true
     }
