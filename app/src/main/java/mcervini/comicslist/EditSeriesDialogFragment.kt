@@ -4,7 +4,6 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
 import android.text.InputType
-import android.view.LayoutInflater
 import android.widget.Button
 import android.widget.EditText
 import androidx.core.widget.doOnTextChanged
@@ -14,7 +13,6 @@ class EditSeriesDialogFragment(private val series: Series, val onConfirm: (Strin
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         if (activity != null) {
             val builder: AlertDialog.Builder = AlertDialog.Builder(activity)
-            val inflater: LayoutInflater = LayoutInflater.from(activity)
 
             builder.setTitle("modifica serie")
             val editText: EditText = EditText(activity)

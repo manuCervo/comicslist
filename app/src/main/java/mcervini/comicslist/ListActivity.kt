@@ -95,6 +95,15 @@ class ListActivity : AppCompatActivity() {
                         series.name = newName
                         listUpdater.updateSeries(series)
                     }.show(supportFragmentManager, "editDialog")
+                } else {
+                    EditComicDialogFragment(comic) { title: String, number: Int, availability: Availability, numberChanged: Boolean ->
+                        comic.availability = availability
+                        comic.title = title
+                        listUpdater.updateComic(comic)
+                        if (numberChanged) {
+                            listUpdater.updateComicNumber(comic, number)
+                        }
+                    }.show(supportFragmentManager, "editDialog")
                 }
             }
         }

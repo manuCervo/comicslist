@@ -43,6 +43,7 @@ class ListUpdater(private val seriesDAO: SeriesDAO, private val comicsDAO: Comic
 
     fun updateComicNumber(comic: Comic, newNumber: Int) {
         comicsDAO.updateComicNumber(comic, newNumber)
+        comic.number = newNumber
         adapter.notifyDataSetChanged()
     }
 }
