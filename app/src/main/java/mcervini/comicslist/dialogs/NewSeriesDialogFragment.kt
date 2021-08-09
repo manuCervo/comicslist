@@ -1,4 +1,4 @@
-package mcervini.comicslist
+package mcervini.comicslist.dialogs
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -8,6 +8,8 @@ import android.view.View
 import android.widget.EditText
 import android.widget.Spinner
 import androidx.fragment.app.DialogFragment
+import mcervini.comicslist.Availability
+import mcervini.comicslist.R
 import mcervini.comicslist.adapters.AvailabilitySpinnerAdapter
 
 class NewSeriesDialogFragment(private val onConfirm: (String, Int, Availability) -> Unit) : DialogFragment() {

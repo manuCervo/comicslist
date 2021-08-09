@@ -11,6 +11,10 @@ import kotlinx.android.synthetic.main.activity_list.*
 import mcervini.comicslist.adapters.SeriesListAdapter
 import mcervini.comicslist.data.SqliteComicsDAO
 import mcervini.comicslist.data.SqliteSeriesDAO
+import mcervini.comicslist.dialogs.EditComicDialogFragment
+import mcervini.comicslist.dialogs.EditSeriesDialogFragment
+import mcervini.comicslist.dialogs.NewComicDialogFragment
+import mcervini.comicslist.dialogs.NewSeriesDialogFragment
 
 class ListActivity : AppCompatActivity() {
     lateinit var list: MutableList<Series>

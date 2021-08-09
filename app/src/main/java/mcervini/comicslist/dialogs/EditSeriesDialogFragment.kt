@@ -1,4 +1,4 @@
-package mcervini.comicslist
+package mcervini.comicslist.dialogs
 
 import android.app.AlertDialog
 import android.app.Dialog
@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.DialogFragment
+import mcervini.comicslist.Series
 
 class EditSeriesDialogFragment(private val series: Series, val onConfirm: (String) -> Unit) : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

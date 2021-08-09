@@ -1,7 +1,9 @@
-package mcervini.comicslist
+package mcervini.comicslist.dialogs
 
 import android.app.Dialog
 import android.os.Bundle
+import mcervini.comicslist.Availability
+import mcervini.comicslist.Series
 
 class NewComicDialogFragment(private val series: Series, private val onConfirm: (Int, String, Availability) -> Unit) : InsertComicDialogFragment("nuovo fumetto") {
 
