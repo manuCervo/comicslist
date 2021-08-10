@@ -10,14 +10,14 @@ import mcervini.comicslist.BuildConfig
 class Database(private val context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     companion object Database {
         private const val DATABASE_NAME = "comics.db"
-        private const val DATABASE_VERSION = 1
+        private const val DATABASE_VERSION = 2
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
         db?.execSQL("""
             CREATE TABLE series (
                 id TEXT PRIMARY KEY,
-                name TEXT NOT NULL
+                name TEXT NOT NULL CHECK(name <> '')
             )
         """.trimIndent())
 

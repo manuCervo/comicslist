@@ -2,11 +2,14 @@ package mcervini.comicslist.dialogs
 
 import android.app.AlertDialog
 import android.app.Dialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
 import android.widget.Spinner
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.DialogFragment
 import mcervini.comicslist.Availability
 import mcervini.comicslist.R
@@ -19,6 +22,7 @@ class NewSeriesDialogFragment(private val onConfirm: (String, Int, Availability)
             val view: View = inflater.inflate(R.layout.new_series_dialog, null)
             val builder: AlertDialog.Builder = AlertDialog.Builder(it)
 
+            builder.setTitle("nuova serie")
             builder.setView(view)
 
             val nameEditText: EditText = view.findViewById(R.id.seriesNameEditText)
@@ -38,7 +42,22 @@ class NewSeriesDialogFragment(private val onConfirm: (String, Int, Availability)
                 dismiss()
             }
 
-            builder.create()
+            val dialog = builder.create()
+
+            dialog.setOnShowListener {
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
+                nameEditText.error = "il nome non può essere vuoto"
+            }
+
+            nameEditText.doOnTextChanged { text, start, before, count ->
+                val button: Button = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                button.isEnabled = ! text.isNullOrBlank()
+                if(!button.isEnabled)
+                {
+                    nameEditText.error = "il nome non può essere vuoto"
+                }
+            }
+            dialog
         } ?: throw IllegalStateException("activity is null")
     }
 }
