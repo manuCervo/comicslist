@@ -1,5 +1,6 @@
 package mcervini.comicslist
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.ContextMenu
 import android.view.Menu
@@ -53,10 +54,6 @@ class ListActivity : AppCompatActivity() {
         return true
     }
 
-    private val onNewSeriesEntered: (String, Int, Availability) -> Unit = { name, numberOfComics, availability ->
-        listUpdater.createSeries(name, numberOfComics, availability)
-    }
-
     override fun onCreateContextMenu(menu: ContextMenu?, v: View?, menuInfo: ContextMenu.ContextMenuInfo?) {
         val info = menuInfo as SeriesRecyclerView.ContextMenuInfo
         menuInflater.inflate(R.menu.modify_delete_context_menu, menu)
@@ -77,48 +74,65 @@ class ListActivity : AppCompatActivity() {
 
         when (item.itemId) {
             R.id.menu_delete -> {
-                val dialog: AlertDialog = AlertDialog.Builder(this)
-                        .setTitle("elimina")
-                        .setMessage("eliminare ${
-                            if (comic != null) {
-                                "fumetto"
-                            } else {
-                                "serie"
-                            }
-                        }?")
-                        .setNegativeButton("no") { dialog, _ -> dialog.dismiss() }
-                        .setPositiveButton("sì") { dialog, _ ->
-                            if (comic != null) {
-                                listUpdater.deleteComic(comic)
-                            } else {
-                                listUpdater.deleteSeries(series)
-                            }
-                        }
-                        .create()
-                dialog.show()
+                makeDeleteDialog(comic != null) { _, _ ->
+                    if (comic != null) {
+                        listUpdater.deleteComic(comic)
+                    } else {
+                        listUpdater.deleteSeries(series)
+                    }
+                }.show()
             }
+
             R.id.menu_edit -> {
                 if (comic == null) {
-                    EditSeriesDialogFragment(series) { newName: String ->
-                        series.name = newName
-                        listUpdater.updateSeries(series)
-                    }.show(supportFragmentManager, "editDialog")
+                    EditSeriesDialogFragment(series) { newName: String -> onEditSeriesConfirm(series, newName) }
+                            .show(supportFragmentManager, "editDialog")
                 } else {
                     EditComicDialogFragment(comic) { title: String, number: Int, availability: Availability, numberChanged: Boolean ->
-                        comic.availability = availability
-                        comic.title = title
-                        listUpdater.updateComic(comic)
-                        if (numberChanged) {
-                            listUpdater.updateComicNumber(comic, number)
-                        }
+                        onEditComicConfirm(comic, title, number, availability, numberChanged)
                     }.show(supportFragmentManager, "editDialog")
                 }
             }
+
             R.id.menu_new_comic ->
                 NewComicDialogFragment(series) { number: Int, title: String, availability: Availability ->
                     listUpdater.createComic(series, number, title, availability)
                 }.show(supportFragmentManager, "newComic")
         }
         return true
+    }
+
+
+    private fun makeDeleteDialog(comic: Boolean, onConfirm: DialogInterface.OnClickListener): AlertDialog {
+        return AlertDialog.Builder(this)
+                .setTitle("elimina")
+                .setMessage("eliminare ${
+                    if (comic) {
+                        "fumetto"
+                    } else {
+                        "serie"
+                    }
+                }?")
+                .setNegativeButton("no") { dialog, _ -> dialog.dismiss() }
+                .setPositiveButton("sì", onConfirm)
+                .create()
+    }
+
+    private val onNewSeriesEntered: (String, Int, Availability) -> Unit = { name, numberOfComics, availability ->
+        listUpdater.createSeries(name, numberOfComics, availability)
+    }
+
+    private fun onEditComicConfirm(comic: Comic, title: String, number: Int, availability: Availability, numberChanged: Boolean) {
+        comic.availability = availability
+        comic.title = title
+        listUpdater.updateComic(comic)
+        if (numberChanged) {
+            listUpdater.updateComicNumber(comic, number)
+        }
+    }
+
+    private fun onEditSeriesConfirm(series: Series, newName: String) {
+        series.name = newName
+        listUpdater.updateSeries(series)
     }
 }

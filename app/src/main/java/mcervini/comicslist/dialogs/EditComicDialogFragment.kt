@@ -1,7 +1,5 @@
 package mcervini.comicslist.dialogs
 
-import android.app.Dialog
-import android.os.Bundle
 import mcervini.comicslist.Availability
 import mcervini.comicslist.Comic
 
@@ -18,23 +16,11 @@ class EditComicDialogFragment(private val currentData: Comic, private val onConf
         }
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState)
-
-        initializeView {
-            numberEditText.setText(currentData.number.toString())
-            titleEditText.setText(currentData.title)
-            availabilitySpinner.setSelection(Availability.values().indexOf(currentData.availability))
-        }
-        return dialog
-    }
-
-    private fun showCurrentData() {
-        numberEditText.setText(currentData.number)
+    override fun initializeView() {
+        numberEditText.setText(currentData.number.toString())
         titleEditText.setText(currentData.title)
         availabilitySpinner.setSelection(Availability.values().indexOf(currentData.availability))
     }
-
 
     override fun checkValidData(): Boolean {
         if (numberEditText.text.isNullOrBlank()) {
@@ -48,7 +34,6 @@ class EditComicDialogFragment(private val currentData: Comic, private val onConf
                 return false
             }
         }
-
         return true
     }
 }

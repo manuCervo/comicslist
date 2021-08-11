@@ -19,17 +19,10 @@ abstract class InsertComicDialogFragment(private val dialogTitle: String) : Dial
     protected lateinit var titleEditText: EditText
     protected lateinit var availabilitySpinner: Spinner
 
-    private var ignoreChanges: Boolean = false
-
     protected abstract fun onDialogConfirmed(number: Int, title: String, availability: Availability)
     protected abstract fun checkValidData(): Boolean
 
-    protected fun initializeView(init: () -> Unit) {
-        ignoreChanges = true
-        init()
-        ignoreChanges = false
-
-    }
+    protected abstract fun initializeView()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         if (activity == null) {
@@ -60,11 +53,13 @@ abstract class InsertComicDialogFragment(private val dialogTitle: String) : Dial
 
         val dialog = builder.create()
 
+        dialog.setOnShowListener {
+            initializeView()
+        }
+
         numberEditText.doOnTextChanged { text, start, before, count ->
-            if (!ignoreChanges) {
-                val button = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                button.isEnabled = checkValidData()
-            }
+            val button = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            button.isEnabled = checkValidData()
         }
 
         return dialog

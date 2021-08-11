@@ -11,8 +11,8 @@ class NewComicDialogFragment(private val series: Series, private val onConfirm: 
         onConfirm(number, title, availability)
     }
 
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState)
+    override fun initializeView()
+    {
         var nextNumber: Int = 0
         for (c in series.comics) {
             if (c.number > nextNumber) {
@@ -20,10 +20,7 @@ class NewComicDialogFragment(private val series: Series, private val onConfirm: 
             }
         }
         nextNumber++
-        initializeView {
-            numberEditText.setText(nextNumber.toString())
-        }
-        return dialog
+        numberEditText.setText(nextNumber.toString())
     }
 
     override fun checkValidData(): Boolean {
