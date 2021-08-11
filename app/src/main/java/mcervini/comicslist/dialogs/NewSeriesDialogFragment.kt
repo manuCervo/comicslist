@@ -2,7 +2,6 @@ package mcervini.comicslist.dialogs
 
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -51,9 +50,8 @@ class NewSeriesDialogFragment(private val onConfirm: (String, Int, Availability)
 
             nameEditText.doOnTextChanged { text, start, before, count ->
                 val button: Button = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                button.isEnabled = ! text.isNullOrBlank()
-                if(!button.isEnabled)
-                {
+                button.isEnabled = !text.isNullOrBlank()
+                if (!button.isEnabled) {
                     nameEditText.error = getString(R.string.name_cant_be_empty)
                 }
             }

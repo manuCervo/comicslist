@@ -1,8 +1,8 @@
 package mcervini.comicslist
 
 import mcervini.comicslist.adapters.SeriesListAdapter
-import mcervini.comicslist.data.ComicsDAO
-import mcervini.comicslist.data.SeriesDAO
+import mcervini.comicslist.io.ComicsDAO
+import mcervini.comicslist.io.SeriesDAO
 
 class ListUpdater(private val seriesDAO: SeriesDAO, private val comicsDAO: ComicsDAO, private val adapter: SeriesListAdapter, private val list: MutableList<Series>) {
     fun createSeries(name: String, numberOfComics: Int, availability: Availability): Series {

@@ -1,7 +1,5 @@
 package mcervini.comicslist.dialogs
 
-import android.app.Dialog
-import android.os.Bundle
 import mcervini.comicslist.Availability
 import mcervini.comicslist.R
 import mcervini.comicslist.Series
@@ -12,8 +10,7 @@ class NewComicDialogFragment(private val series: Series, private val onConfirm: 
         onConfirm(number, title, availability)
     }
 
-    override fun initializeView()
-    {
+    override fun initializeView() {
         var nextNumber: Int = 0
         for (c in series.comics) {
             if (c.number > nextNumber) {

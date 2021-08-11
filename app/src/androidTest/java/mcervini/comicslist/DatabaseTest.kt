@@ -3,9 +3,9 @@ package mcervini.comicslist
 import android.content.Context
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import mcervini.comicslist.data.Database
-import mcervini.comicslist.data.SqliteComicsDAO
-import mcervini.comicslist.data.SqliteSeriesDAO
+import mcervini.comicslist.io.Database
+import mcervini.comicslist.io.SqliteComicsDAO
+import mcervini.comicslist.io.SqliteSeriesDAO
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -58,8 +58,7 @@ class DatabaseTest {
     }
 
     @Test
-    fun seriesUpdating()
-    {
+    fun seriesUpdating() {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
 
         clearDatabase(appContext)
@@ -77,20 +76,18 @@ class DatabaseTest {
         series[5].name = "dddd"
         series[9].name = "eeee"
 
-        for(s in series)
-        {
+        for (s in series) {
             dao.updateSeries(s)
         }
 
         val result = dao.getAllSeries()
 
-        assertSeriesEqual(series,result)
+        assertSeriesEqual(series, result)
 
     }
 
     @Test
-    fun comicsInsertion()
-    {
+    fun comicsInsertion() {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
 
         clearDatabase(appContext)
@@ -98,7 +95,7 @@ class DatabaseTest {
 
         val dao = SqliteComicsDAO(appContext)
         val seriesDAO = SqliteSeriesDAO(appContext)
-        val comics:MutableList<Comic> = mutableListOf()
+        val comics: MutableList<Comic> = mutableListOf()
 
         val series: MutableList<Series> = mutableListOf()
         for (i in 1..5) {
@@ -108,107 +105,95 @@ class DatabaseTest {
 
 
 
-        for (s in series)
-        {
-            for(i in 1..10)
-            {
-                comics.add(dao.createNewComic(s,i,"comic$i", Availability.BOOKED))
+        for (s in series) {
+            for (i in 1..10) {
+                comics.add(dao.createNewComic(s, i, "comic$i", Availability.BOOKED))
             }
         }
 
         val result = dao.getAllComics()
 
-        assertComicsEquals(comics,result)
+        assertComicsEquals(comics, result)
     }
 
     @Test
-    fun comicUpdating()
-    {
+    fun comicUpdating() {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
 
         clearDatabase(appContext)
 
         val dao = SqliteComicsDAO(appContext)
         val seriesDAO = SqliteSeriesDAO(appContext)
-        val comics:MutableList<Comic> = mutableListOf()
+        val comics: MutableList<Comic> = mutableListOf()
 
         val series: MutableList<Series> = mutableListOf()
         for (i in 1..5) {
             series.add(seriesDAO.createNewSeries("series$i", 0, Availability.BOOKED))
         }
 
-        for (s in series)
-        {
-            for(i in 1..2)
-            {
-                comics.add(dao.createNewComic(s,i,"comic$i", Availability.BOOKED))
+        for (s in series) {
+            for (i in 1..2) {
+                comics.add(dao.createNewComic(s, i, "comic$i", Availability.BOOKED))
             }
         }
 
-        for(i in 0 until series.size step 2)
-        {
+        for (i in 0 until series.size step 2) {
             comics[i].title = "aaaaaaaaa$i"
             comics[i].availability = Availability.NOT_AVAILABLE
         }
 
-        for(c in comics)
-        {
+        for (c in comics) {
             dao.updateComic(c)
         }
 
         var result = dao.getAllComics()
 
-        assertComicsEquals(result,comics)
+        assertComicsEquals(result, comics)
 
 
-        for(i in 0 until series.size step 2)
-        {
-            dao.updateComicNumber(comics[i],1000+i)
-            comics[i].number = 1000+i
+        for (i in 0 until series.size step 2) {
+            dao.updateComicNumber(comics[i], 1000 + i)
+            comics[i].number = 1000 + i
         }
 
 
         result = dao.getAllComics()
 
-        assertComicsEquals(result,comics)
+        assertComicsEquals(result, comics)
 
     }
 
     @Test
-    fun comicDeletion()
-    {
+    fun comicDeletion() {
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
 
         clearDatabase(appContext)
 
         val dao = SqliteComicsDAO(appContext)
         val seriesDAO = SqliteSeriesDAO(appContext)
-        val comics:MutableList<Comic> = mutableListOf()
+        val comics: MutableList<Comic> = mutableListOf()
 
         val series: MutableList<Series> = mutableListOf()
         for (i in 1..5) {
             series.add(seriesDAO.createNewSeries("series$i", 0, Availability.BOOKED))
         }
 
-        for (s in series)
-        {
-            for(i in 1..10)
-            {
-                comics.add(dao.createNewComic(s,i,"comic$i", Availability.BOOKED))
+        for (s in series) {
+            for (i in 1..10) {
+                comics.add(dao.createNewComic(s, i, "comic$i", Availability.BOOKED))
             }
         }
 
-        val toDelete = comics.filterIndexed { index, comic -> index%2 == 0  }
+        val toDelete = comics.filterIndexed { index, comic -> index % 2 == 0 }
 
-        for(c in toDelete)
-        {
+        for (c in toDelete) {
             dao.deleteComic(c)
             comics.remove(c)
         }
 
         val result = dao.getAllComics()
 
-        assertComicsEquals(result,comics)
+        assertComicsEquals(result, comics)
 
     }
 

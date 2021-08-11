@@ -1,4 +1,4 @@
-package mcervini.comicslist.data
+package mcervini.comicslist.io
 
 import mcervini.comicslist.Availability
 import mcervini.comicslist.Series

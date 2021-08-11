@@ -1,4 +1,4 @@
-package mcervini.comicslist.data
+package mcervini.comicslist.io
 
 import android.content.ContentValues
 import android.content.Context
@@ -30,12 +30,13 @@ class SqliteSeriesDAO(val context: Context) : SeriesDAO {
 
             val number: Int = result.getInt(result.getColumnIndex("number"))
             val title: String = result.getString(result.getColumnIndex("title"))
-            val availability: Availability = when (result.getInt(result.getColumnIndex("availability"))) {
-                0 -> Availability.AVAILABLE
-                1 -> Availability.NOT_AVAILABLE
-                2 -> Availability.BOOKED
-                else -> throw IllegalArgumentException()
-            }
+//            val availability: Availability = when (result.getInt(result.getColumnIndex("availability"))) {
+//                0 -> Availability.AVAILABLE
+//                1 -> Availability.NOT_AVAILABLE
+//                2 -> Availability.BOOKED
+//                else -> throw IllegalArgumentException()
+//        }
+            val availability: Availability = Availability.fromValue(result.getInt(result.getColumnIndex("availability")))
 
             series.comics.add(Comic(series, number, title, availability))
         }

@@ -14,7 +14,7 @@ import mcervini.comicslist.Availability
 import mcervini.comicslist.R
 import mcervini.comicslist.adapters.AvailabilitySpinnerAdapter
 
-abstract class InsertComicDialogFragment(@StringRes private val titleRes:Int) : DialogFragment() {
+abstract class InsertComicDialogFragment(@StringRes private val titleRes: Int) : DialogFragment() {
 
     protected lateinit var numberEditText: EditText
     protected lateinit var titleEditText: EditText

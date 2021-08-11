@@ -1,4 +1,4 @@
-package mcervini.comicslist.data
+package mcervini.comicslist.io
 
 import android.content.ContentValues
 import android.content.Context
