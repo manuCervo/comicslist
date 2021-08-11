@@ -3,5 +3,5 @@
 
     <item
         android:id="@+id/menu_new_comic"
-        android:title="nuovo fumetto" />
+        android:title="@string/new_comic" />
 </menu>

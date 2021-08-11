@@ -2,8 +2,9 @@ package mcervini.comicslist.dialogs
 
 import mcervini.comicslist.Availability
 import mcervini.comicslist.Comic
+import mcervini.comicslist.R
 
-class EditComicDialogFragment(private val currentData: Comic, private val onConfirm: (String, Int, Availability, Boolean) -> Unit) : InsertComicDialogFragment("modifica fumetto") {
+class EditComicDialogFragment(private val currentData: Comic, private val onConfirm: (String, Int, Availability, Boolean) -> Unit) : InsertComicDialogFragment(R.string.edit_comic) {
 
     override fun onDialogConfirmed(number: Int, title: String, availability: Availability) {
         var numberChanged = false
@@ -24,13 +25,13 @@ class EditComicDialogFragment(private val currentData: Comic, private val onConf
 
     override fun checkValidData(): Boolean {
         if (numberEditText.text.isNullOrBlank()) {
-            numberEditText.error = "il numero non èuò essere vuoto"
+            numberEditText.error = getString(R.string.comic_number_cant_be_empty)
             return false
         }
         val number: Int = numberEditText.text.toString().toInt()
         for (c in currentData.series.comics) {
             if (c != currentData && number == c.number) {
-                numberEditText.error = "c'è già un altro fumetto con questo numero"
+                numberEditText.error = getString(R.string.comic_number_already_used)
                 return false
             }
         }

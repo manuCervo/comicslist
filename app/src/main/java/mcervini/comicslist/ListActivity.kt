@@ -105,16 +105,14 @@ class ListActivity : AppCompatActivity() {
 
     private fun makeDeleteDialog(comic: Boolean, onConfirm: DialogInterface.OnClickListener): AlertDialog {
         return AlertDialog.Builder(this)
-                .setTitle("elimina")
-                .setMessage("eliminare ${
-                    if (comic) {
-                        "fumetto"
-                    } else {
-                        "serie"
-                    }
-                }?")
-                .setNegativeButton("no") { dialog, _ -> dialog.dismiss() }
-                .setPositiveButton("sì", onConfirm)
+                .setTitle(getString(R.string.delete))
+                .setMessage(if (comic) {
+                    R.string.delete_comic_question
+                } else {
+                    R.string.delete_series_question
+                })
+                .setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
+                .setPositiveButton(R.string.yes, onConfirm)
                 .create()
     }
 

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">comicslist</string>
+    <string name="available">disponibile</string>
+    <string name="not_available">non disponibile</string>
+    <string name="booked">prenotato</string>
+    <string name="edit_comic">modifica fumetto</string>
+    <string name="comic_number_cant_be_empty">il numero non può essere vuoto</string>
+    <string name="comic_number_already_used">c\'è già un altro fumetto con questo numero</string>
+    <string name="edit_series">modifica serie</string>
+    <string name="name">nome</string>
+    <string name="cancel">annulla</string>
+    <string name="name_cant_be_empty">il nome non può essere vuoto</string>
+    <string name="delete">elimina</string>
+    <string name="delete_comic_question">eliminare fumetto?</string>
+    <string name="delete_series_question">eliminare serie?</string>
+    <string name="yes">sì</string>
+    <string name="new_comic">nuovo fumetto</string>
+    <string name="new_Series">nuova serie</string>
+    <string name="view_list">lista</string>
+    <string name="view_missing">mancolist</string>
+    <string name="search">cerca</string>
+    <string name="number">numero</string>
+    <string name="title">titolo</string>
+    <string name="number_of_comics">n. volumi</string>
+    <string name="add">aggiungi</string>
+    <string name="edit">modifica</string>
+</resources>

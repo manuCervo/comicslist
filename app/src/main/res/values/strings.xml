@@ -1,6 +1,30 @@
 <resources>
     <string name="app_name">comicslist</string>
-    <string name="available">disponibile</string>
-    <string name="not_available">non disponibile</string>
-    <string name="booked">prenotato</string>
+    <string name="available">available</string>
+    <string name="not_available">not available</string>
+    <string name="booked">booked</string>
+    <string name="edit_comic">edit comic</string>
+    <string name="comic_number_cant_be_empty">the number can\'t be empty</string>
+    <string name="comic_number_already_used">there\'s another comic with this number</string>
+    <string name="edit_series">edit series</string>
+    <string name="name">name</string>
+    <string name="cancel">cancel</string>
+    <string name="ok" translatable="false">ok</string>
+    <string name="name_cant_be_empty">name can\'t be empty</string>
+    <string name="delete">delete</string>
+    <string name="delete_comic_question">delete comic?</string>
+    <string name="delete_series_question">delete series?</string>
+    <string name="no" translatable="false">no</string>
+    <string name="yes">yes</string>
+    <string name="new_comic">new comic</string>
+    <string name="new_Series">new series</string>
+    <string name="view_list">list</string>
+    <string name="view_missing">missing list</string>
+    <string name="search">search</string>
+    <string name="number">number</string>
+    <string name="title">title</string>
+    <string name="number_of_comics">comics</string>
+    <string name="backup" translatable="false">backup</string>
+    <string name="add">add</string>
+    <string name="edit">edit</string>
 </resources>

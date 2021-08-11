@@ -4,11 +4,11 @@
 
     <item
         android:icon="@drawable/ic_round_sd_storage_24"
-        android:title="backup"
+        android:title="@string/backup"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menu_add"
         android:icon="@drawable/ic_round_add_24"
-        android:title="add"
+        android:title="@string/add"
         app:showAsAction="always" />
 </menu>

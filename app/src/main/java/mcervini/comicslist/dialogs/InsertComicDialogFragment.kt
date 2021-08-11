@@ -7,13 +7,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
 import android.widget.Spinner
+import androidx.annotation.StringRes
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.DialogFragment
 import mcervini.comicslist.Availability
 import mcervini.comicslist.R
 import mcervini.comicslist.adapters.AvailabilitySpinnerAdapter
 
-abstract class InsertComicDialogFragment(private val dialogTitle: String) : DialogFragment() {
+abstract class InsertComicDialogFragment(@StringRes private val titleRes:Int) : DialogFragment() {
 
     protected lateinit var numberEditText: EditText
     protected lateinit var titleEditText: EditText
@@ -39,12 +40,12 @@ abstract class InsertComicDialogFragment(private val dialogTitle: String) : Dial
         availabilitySpinner = view.findViewById(R.id.availabilitySpinner)
         availabilitySpinner.adapter = AvailabilitySpinnerAdapter(requireContext())
 
-        builder.setTitle(dialogTitle)
+        builder.setTitle(titleRes)
         builder.setView(view)
 
 
-        builder.setNegativeButton("annulla") { dialog, which -> dialog.dismiss() }
-        builder.setPositiveButton("ok") { dialog, which ->
+        builder.setNegativeButton(R.string.cancel) { dialog, which -> dialog.dismiss() }
+        builder.setPositiveButton(R.string.ok) { dialog, which ->
             val number: Int = numberEditText.text.toString().toInt()
             val title: String = titleEditText.text.toString()
             val availability: Availability = availabilitySpinner.selectedItem as Availability

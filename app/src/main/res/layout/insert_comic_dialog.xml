@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:ems="10"
-        android:hint="numero"
+        android:hint="@string/number"
         android:inputType="number" />
 
     <EditText
@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:ems="10"
-        android:hint="titolo"
+        android:hint="@string/title"
         android:inputType="textPersonName" />
 
     <Spinner

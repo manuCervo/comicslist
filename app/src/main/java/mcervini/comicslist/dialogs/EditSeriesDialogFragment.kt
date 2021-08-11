@@ -8,6 +8,7 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.DialogFragment
+import mcervini.comicslist.R
 import mcervini.comicslist.Series
 
 class EditSeriesDialogFragment(private val series: Series, val onConfirm: (String) -> Unit) : DialogFragment() {
@@ -15,15 +16,15 @@ class EditSeriesDialogFragment(private val series: Series, val onConfirm: (Strin
         if (activity != null) {
             val builder: AlertDialog.Builder = AlertDialog.Builder(activity)
 
-            builder.setTitle("modifica serie")
+            builder.setTitle(R.string.edit_series)
             val editText: EditText = EditText(activity)
-            editText.hint = "nome"
+            editText.setHint(R.string.name)
             editText.inputType = InputType.TYPE_CLASS_TEXT
             editText.maxLines = 1
             editText.setText(series.name)
             builder.setView(editText)
-            builder.setNegativeButton("annulla") { dialog, which -> dialog.dismiss() }
-            builder.setPositiveButton("ok") { dialog, which ->
+            builder.setNegativeButton(R.string.cancel) { dialog, which -> dialog.dismiss() }
+            builder.setPositiveButton(R.string.ok) { dialog, which ->
                 val newName: String = editText.text.toString()
                 onConfirm(newName)
                 dialog.dismiss()
@@ -35,7 +36,7 @@ class EditSeriesDialogFragment(private val series: Series, val onConfirm: (Strin
                 val button: Button = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
                 button.isEnabled = !text.isNullOrBlank()
                 if (!button.isEnabled) {
-                    editText.error = "il nome non può essere vuoto"
+                    editText.error = getString(R.string.name_cant_be_empty)
                 }
             }
 

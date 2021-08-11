@@ -22,7 +22,7 @@ class NewSeriesDialogFragment(private val onConfirm: (String, Int, Availability)
             val view: View = inflater.inflate(R.layout.new_series_dialog, null)
             val builder: AlertDialog.Builder = AlertDialog.Builder(it)
 
-            builder.setTitle("nuova serie")
+            builder.setTitle(R.string.new_Series)
             builder.setView(view)
 
             val nameEditText: EditText = view.findViewById(R.id.seriesNameEditText)
@@ -31,14 +31,14 @@ class NewSeriesDialogFragment(private val onConfirm: (String, Int, Availability)
             availabilitySpinner.adapter = AvailabilitySpinnerAdapter(requireContext())
             availabilitySpinner.setSelection(0)
 
-            builder.setPositiveButton("ok") { dialog, id ->
+            builder.setPositiveButton(R.string.ok) { dialog, id ->
                 val name: String = nameEditText.text.toString()
                 val numberOfComics: Int = numberEditText.text.toString().toIntOrNull() ?: 0
                 val availability: Availability = availabilitySpinner.selectedItem as Availability
                 onConfirm(name, numberOfComics, availability)
             }
 
-            builder.setNegativeButton("annulla") { dialog, id ->
+            builder.setNegativeButton(R.string.cancel) { dialog, id ->
                 dismiss()
             }
 
@@ -46,7 +46,7 @@ class NewSeriesDialogFragment(private val onConfirm: (String, Int, Availability)
 
             dialog.setOnShowListener {
                 dialog.getButton(AlertDialog.BUTTON_POSITIVE).isEnabled = false
-                nameEditText.error = "il nome non può essere vuoto"
+                nameEditText.error = getString(R.string.name_cant_be_empty)
             }
 
             nameEditText.doOnTextChanged { text, start, before, count ->
@@ -54,7 +54,7 @@ class NewSeriesDialogFragment(private val onConfirm: (String, Int, Availability)
                 button.isEnabled = ! text.isNullOrBlank()
                 if(!button.isEnabled)
                 {
-                    nameEditText.error = "il nome non può essere vuoto"
+                    nameEditText.error = getString(R.string.name_cant_be_empty)
                 }
             }
             dialog
