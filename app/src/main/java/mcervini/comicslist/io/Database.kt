@@ -7,21 +7,25 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import mcervini.comicslist.BuildConfig
 
-class Database(private val context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
+class Database(private val context: Context) :
+    SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
     companion object Database {
         private const val DATABASE_NAME = "comics.db"
         private const val DATABASE_VERSION = 2
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-        db?.execSQL("""
+        db?.execSQL(
+            """
             CREATE TABLE series (
                 id TEXT PRIMARY KEY,
                 name TEXT NOT NULL CHECK(name <> '')
             )
-        """.trimIndent())
+        """.trimIndent()
+        )
 
-        db?.execSQL("""
+        db?.execSQL(
+            """
             CREATE TABLE comic(
                 number INTEGER,
                 series_id TEXT,
@@ -31,7 +35,8 @@ class Database(private val context: Context) : SQLiteOpenHelper(context, DATABAS
                 FOREIGN KEY(series_id) references series(id) ON DELETE CASCADE ON UPDATE CASCADE
                 
             )
-        """.trimIndent())
+        """.trimIndent()
+        )
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, p1: Int, p2: Int) {

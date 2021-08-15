@@ -4,7 +4,12 @@ import mcervini.comicslist.adapters.SeriesListAdapter
 import mcervini.comicslist.io.ComicsDAO
 import mcervini.comicslist.io.SeriesDAO
 
-class ListUpdater(private val seriesDAO: SeriesDAO, private val comicsDAO: ComicsDAO, private val adapter: SeriesListAdapter, private val list: MutableList<Series>) {
+class ListUpdater(
+    private val seriesDAO: SeriesDAO,
+    private val comicsDAO: ComicsDAO,
+    private val adapter: SeriesListAdapter,
+    private val list: MutableList<Series>
+) {
     fun createSeries(name: String, numberOfComics: Int, availability: Availability): Series {
         val series: Series = seriesDAO.createNewSeries(name, numberOfComics, availability)
         list.add(series)

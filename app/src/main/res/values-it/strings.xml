@@ -25,4 +25,6 @@
     <string name="number_of_comics">n. volumi</string>
     <string name="add">aggiungi</string>
     <string name="edit">modifica</string>
+    <string name="make_backup">crea backup</string>
+    <string name="import_backup">importa backup</string>
 </resources>

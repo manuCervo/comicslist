@@ -14,7 +14,8 @@ import mcervini.comicslist.Availability
 import mcervini.comicslist.R
 import mcervini.comicslist.adapters.AvailabilitySpinnerAdapter
 
-class NewSeriesDialogFragment(private val onConfirm: (String, Int, Availability) -> Unit) : DialogFragment() {
+class NewSeriesDialogFragment(private val onConfirm: (String, Int, Availability) -> Unit) :
+    DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             val inflater: LayoutInflater = requireActivity().layoutInflater

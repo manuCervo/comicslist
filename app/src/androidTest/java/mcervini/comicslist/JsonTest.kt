@@ -18,7 +18,9 @@ class JsonTest {
 
     @Test
     fun testWrite() {
+
         val file: File = File(context.getExternalFilesDir(null), "testWrite.json")
+
         val series1 = Series(UUID.fromString("9d03c7cd-fc09-485d-8c7d-8531cc9b7e89"), "series1")
         for (i in 1..3) {
             series1.comics.add(Comic(series1, i, "", Availability.fromValue(i - 1)))
@@ -33,7 +35,7 @@ class JsonTest {
 
         val series: MutableList<Series> = mutableListOf(series1, series2, series3)
 
-        val jsonExporter = JsonExporter(file)
+        val jsonExporter = JsonExporter(file.outputStream())
 
         jsonExporter.export(series)
 
@@ -51,7 +53,7 @@ class JsonTest {
         val writer: FileWriter = FileWriter(file)
         writer.write(json)
         writer.close()
-        val jsonImporter: JsonImporter = JsonImporter(file)
+        val jsonImporter: JsonImporter = JsonImporter(file.inputStream())
 
         val series: MutableList<Series> = jsonImporter.import()
 

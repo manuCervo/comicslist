@@ -6,7 +6,8 @@ import androidx.recyclerview.widget.RecyclerView
 import mcervini.comicslist.R
 import mcervini.comicslist.Series
 
-class SeriesListAdapter(private val list: MutableList<Series>) : RecyclerView.Adapter<SeriesViewHolder>() {
+class SeriesListAdapter(private val list: MutableList<Series>) :
+    RecyclerView.Adapter<SeriesViewHolder>() {
     private val resource = R.layout.listitem_series
 
     override fun getItemCount(): Int {

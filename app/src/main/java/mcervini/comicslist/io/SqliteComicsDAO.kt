@@ -19,7 +19,12 @@ class SqliteComicsDAO(private val context: Context) : ComicsDAO {
         return comics
     }
 
-    override fun createNewComic(series: Series, number: Int, title: String, availability: Availability): Comic {
+    override fun createNewComic(
+        series: Series,
+        number: Int,
+        title: String,
+        availability: Availability
+    ): Comic {
         val comic: Comic = Comic(series, number, title, availability)
         val values: ContentValues = comicToContentValues(comic)
         database.insert("comic", values)
@@ -27,7 +32,11 @@ class SqliteComicsDAO(private val context: Context) : ComicsDAO {
     }
 
     override fun updateComic(comic: Comic) {
-        database.update("comic", comicToContentValues(comic), "number = ${comic.number} AND series_id = '${comic.series.id}'")
+        database.update(
+            "comic",
+            comicToContentValues(comic),
+            "number = ${comic.number} AND series_id = '${comic.series.id}'"
+        )
     }
 
     override fun deleteComic(comic: Comic) {
@@ -36,7 +45,16 @@ class SqliteComicsDAO(private val context: Context) : ComicsDAO {
 
     override fun updateComicNumber(comic: Comic, newNumber: Int) {
         val values: ContentValues = comicToContentValues(comic.copy(number = newNumber))
-        database.update("comic", values, "number = ${comic.number} AND series_id = '${comic.series.id}'")
+        database.update(
+            "comic",
+            values,
+            "number = ${comic.number} AND series_id = '${comic.series.id}'"
+        )
+    }
+
+    override fun addExistingComic(comic: Comic) {
+        val values = comicToContentValues(comic)
+        database.insert("comic", values)
     }
 
     private fun comicToContentValues(comic: Comic): ContentValues {

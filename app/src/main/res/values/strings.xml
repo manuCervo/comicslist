@@ -27,4 +27,9 @@
     <string name="backup" translatable="false">backup</string>
     <string name="add">add</string>
     <string name="edit">edit</string>
+    <string name="make_backup">create backup</string>
+    <string name="import_backup">import backup</string>
+    <string name="comics_exported">comics exported</string>
+    <string name="creating_backup">creating backup...</string>
+    <string name="importing_backup">importing backup...</string>
 </resources>

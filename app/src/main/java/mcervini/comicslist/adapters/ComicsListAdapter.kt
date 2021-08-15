@@ -7,7 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import mcervini.comicslist.Comic
 import mcervini.comicslist.R
 
-class ComicsListAdapter(private val list: MutableList<Comic>) : RecyclerView.Adapter<ComicsListViewHolder>() {
+class ComicsListAdapter(private val list: MutableList<Comic>) :
+    RecyclerView.Adapter<ComicsListViewHolder>() {
     private val resource = R.layout.listitem_comic
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ComicsListViewHolder {
         val inflater = LayoutInflater.from(parent.context)

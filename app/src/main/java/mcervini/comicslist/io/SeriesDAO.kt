@@ -8,4 +8,5 @@ interface SeriesDAO {
     fun createNewSeries(name: String, numberOfComics: Int, availability: Availability): Series
     fun updateSeries(series: Series)
     fun deleteSeries(series: Series)
+    fun addExistingSeries(series: Series)
 }

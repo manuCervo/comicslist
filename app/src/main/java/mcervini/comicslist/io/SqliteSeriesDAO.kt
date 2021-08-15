@@ -19,7 +19,8 @@ class SqliteSeriesDAO(val context: Context) : SeriesDAO {
         val allSeries: MutableMap<UUID, Series> = mutableMapOf()
 
         while (result.moveToNext()) {
-            val seriesId: UUID = UUID.fromString(result.getString(result.getColumnIndex("series_id")))
+            val seriesId: UUID =
+                UUID.fromString(result.getString(result.getColumnIndex("series_id")))
 
             if (!allSeries.containsKey(seriesId)) {
                 val name: String = result.getString(result.getColumnIndex("name"))
@@ -30,13 +31,8 @@ class SqliteSeriesDAO(val context: Context) : SeriesDAO {
 
             val number: Int = result.getInt(result.getColumnIndex("number"))
             val title: String = result.getString(result.getColumnIndex("title"))
-//            val availability: Availability = when (result.getInt(result.getColumnIndex("availability"))) {
-//                0 -> Availability.AVAILABLE
-//                1 -> Availability.NOT_AVAILABLE
-//                2 -> Availability.BOOKED
-//                else -> throw IllegalArgumentException()
-//        }
-            val availability: Availability = Availability.fromValue(result.getInt(result.getColumnIndex("availability")))
+            val availability: Availability =
+                Availability.fromValue(result.getInt(result.getColumnIndex("availability")))
 
             series.comics.add(Comic(series, number, title, availability))
         }
@@ -44,7 +40,11 @@ class SqliteSeriesDAO(val context: Context) : SeriesDAO {
         return allSeries.values.toMutableList()
     }
 
-    override fun createNewSeries(name: String, numberOfComics: Int, availability: Availability): Series {
+    override fun createNewSeries(
+        name: String,
+        numberOfComics: Int,
+        availability: Availability
+    ): Series {
 
         val uuid: UUID = UUID.randomUUID()
 
@@ -70,6 +70,11 @@ class SqliteSeriesDAO(val context: Context) : SeriesDAO {
 
     override fun deleteSeries(series: Series) {
         database.delete("series", "id = '${series.id}'")
+    }
+
+    override fun addExistingSeries(series: Series) {
+        val values: ContentValues = seriesToContentValues(series)
+        database.insert("series", values)
     }
 
     private fun seriesToContentValues(series: Series): ContentValues {

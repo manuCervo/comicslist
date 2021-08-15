@@ -10,7 +10,11 @@ import android.widget.TextView
 import mcervini.comicslist.Availability
 import mcervini.comicslist.R
 
-class AvailabilitySpinnerAdapter(context: Context) : ArrayAdapter<Availability>(context, R.layout.listitem_availability_spinner, Availability.values()) {
+class AvailabilitySpinnerAdapter(context: Context) : ArrayAdapter<Availability>(
+    context,
+    R.layout.listitem_availability_spinner,
+    Availability.values()
+) {
     private val items = Availability.values()
     private val resource = R.layout.listitem_availability_spinner
 

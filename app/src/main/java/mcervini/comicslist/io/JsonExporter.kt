@@ -1,20 +1,16 @@
 package mcervini.comicslist.io
 
-import android.util.JsonReader
 import android.util.JsonWriter
-import mcervini.comicslist.Availability
 import mcervini.comicslist.Comic
 import mcervini.comicslist.Series
-import java.io.File
-import java.io.FileReader
-import java.io.FileWriter
-import java.util.*
+import java.io.OutputStream
+import java.io.OutputStreamWriter
 
-class JsonExporter(private val file: File) {
+class JsonExporter(private val stream: OutputStream) {
 
 
     fun export(series: MutableList<Series>) {
-        val writer: JsonWriter = JsonWriter(FileWriter(file))
+        val writer: JsonWriter = JsonWriter(OutputStreamWriter(stream))
 
         writer.beginArray()
         for (s in series) {

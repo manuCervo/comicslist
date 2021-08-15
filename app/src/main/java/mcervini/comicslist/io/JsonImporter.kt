@@ -4,16 +4,15 @@ import android.util.JsonReader
 import mcervini.comicslist.Availability
 import mcervini.comicslist.Comic
 import mcervini.comicslist.Series
-import java.io.File
-import java.io.FileReader
+import java.io.InputStream
+import java.io.InputStreamReader
 import java.util.*
 
-class JsonImporter(private val file: File) {
+class JsonImporter(private val stream: InputStream) {
     private class ComicData(val number: Int, val title: String, val availability: Availability)
 
     fun import(): MutableList<Series> {
-
-        val reader: JsonReader = JsonReader(FileReader(file))
+        val reader: JsonReader = JsonReader(InputStreamReader(stream))
         reader.beginArray()
         val series: MutableList<Series> = mutableListOf()
         while (reader.hasNext()) {

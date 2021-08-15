@@ -11,11 +11,15 @@ class SeriesRecyclerView : RecyclerView {
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
 
     class ContextMenuInfo(
-            val position: Int,
-            val nestedPosition: Int
+        val position: Int,
+        val nestedPosition: Int
     ) : ContextMenu.ContextMenuInfo
 
 
