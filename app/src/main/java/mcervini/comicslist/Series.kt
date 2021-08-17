@@ -10,4 +10,18 @@ data class Series(
     override fun toString(): String {
         return "Series(id=$id, name='$name', comicsCount=${comics.size})"
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (other != null && other is Series) {
+            return other.id.equals(this.id) && other.name.equals(this.name)
+        }
+        return super.equals(other)
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + name.hashCode()
+        result = 31 * result + comics.hashCode()
+        return result
+    }
 }

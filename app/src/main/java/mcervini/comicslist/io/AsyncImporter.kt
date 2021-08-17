@@ -1,10 +1,11 @@
-package mcervini.comicslist
+package mcervini.comicslist.io
 
 import androidx.appcompat.app.AppCompatActivity
+import mcervini.comicslist.BackgroundTask
+import mcervini.comicslist.Comic
+import mcervini.comicslist.R
+import mcervini.comicslist.Series
 import mcervini.comicslist.adapters.SeriesListAdapter
-import mcervini.comicslist.io.ComicsDAO
-import mcervini.comicslist.io.JsonImporter
-import mcervini.comicslist.io.SeriesDAO
 import java.io.InputStream
 import java.util.*
 import java.util.concurrent.Executor
@@ -17,7 +18,10 @@ class AsyncImporter(
     private val comicsDAO: ComicsDAO,
     private val adapter: SeriesListAdapter,
     executor: Executor
-) : BackgroundTask(activity, executor, R.string.importing_backup) {
+) : BackgroundTask(
+    activity, executor,
+    R.string.importing_backup
+) {
     override fun doTask() {
         val imported: MutableList<Series> = JsonImporter(stream).import()
 
@@ -39,19 +43,30 @@ class AsyncImporter(
         for ((progress, s) in imported.withIndex()) {
             val seriesId: UUID = s.id
             if (currentSeries.containsKey(seriesId)) {
-                list.remove(currentSeries[seriesId])
-                list.add(s)
-                seriesDAO.updateSeries(s)
+                val series: Series = currentSeries[seriesId]!!
+                if (series != s) {
+                    series.name = s.name
+                    seriesDAO.updateSeries(series)
+                }
+
+                for (c in s.comics) {
+                    val key = Pair(seriesId, c.number)
+                    if (currentComics.containsKey(key)) {
+                        val comic: Comic = currentComics[key]!!
+                        if (comic != c) {
+                            comic.title = c.title
+                            comic.availability = c.availability
+                            comicsDAO.updateComic(comic)
+                        }
+                    } else {
+                        series.comics.add(c)
+                        comicsDAO.addExistingComic(c)
+                    }
+                }
             } else {
                 seriesDAO.addExistingSeries(s)
                 list.add(s)
-            }
-
-            for (c in s.comics) {
-                val key = Pair(seriesId, c.number)
-                if (currentComics.containsKey(key)) {
-                    comicsDAO.updateComic(c)
-                } else {
+                for (c in s.comics) {
                     comicsDAO.addExistingComic(c)
                 }
             }
