@@ -12,10 +12,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_list.*
 import mcervini.comicslist.adapters.SeriesListAdapter
-import mcervini.comicslist.dialogs.EditComicDialogFragment
-import mcervini.comicslist.dialogs.EditSeriesDialogFragment
-import mcervini.comicslist.dialogs.NewComicDialogFragment
-import mcervini.comicslist.dialogs.NewSeriesDialogFragment
+import mcervini.comicslist.dialogs.*
 import mcervini.comicslist.io.AsyncExporter
 import mcervini.comicslist.io.AsyncImporter
 import mcervini.comicslist.io.SqliteComicsDAO
@@ -194,15 +191,30 @@ class ListActivity : AppCompatActivity() {
     }
 
     private fun importBackup(uri: Uri) {
-        AsyncImporter(
-            this,
-            applicationContext.contentResolver.openInputStream(uri)!!,
-            list,
-            seriesDAO,
-            comicsDAO,
-            seriesListAdapter,
-            executor
-        ).run()
+        if (list.size == 0) {
+            AsyncImporter(
+                this,
+                applicationContext.contentResolver.openInputStream(uri)!!,
+                list,
+                seriesDAO,
+                comicsDAO,
+                seriesListAdapter,
+                executor
+            ).run()
+        } else {
+            ImportOptionsDialog { overwrite ->
+                AsyncImporter(
+                    this,
+                    applicationContext.contentResolver.openInputStream(uri)!!,
+                    list,
+                    seriesDAO,
+                    comicsDAO,
+                    seriesListAdapter,
+                    executor,
+                    overwrite
+                ).run()
+            }.show(supportFragmentManager, "ImportOptions")
+        }
     }
 
     private fun makeBackup(uri: Uri) {

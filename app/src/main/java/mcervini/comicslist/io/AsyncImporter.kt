@@ -17,7 +17,8 @@ class AsyncImporter(
     private val seriesDAO: SeriesDAO,
     private val comicsDAO: ComicsDAO,
     private val adapter: SeriesListAdapter,
-    executor: Executor
+    executor: Executor,
+    private val overwriteExisting:Boolean = true
 ) : BackgroundTask(
     activity, executor,
     R.string.importing_backup
@@ -44,7 +45,7 @@ class AsyncImporter(
             val seriesId: UUID = s.id
             if (currentSeries.containsKey(seriesId)) {
                 val series: Series = currentSeries[seriesId]!!
-                if (series != s) {
+                if (overwriteExisting && series != s) {
                     series.name = s.name
                     seriesDAO.updateSeries(series)
                 }
@@ -52,11 +53,14 @@ class AsyncImporter(
                 for (c in s.comics) {
                     val key = Pair(seriesId, c.number)
                     if (currentComics.containsKey(key)) {
-                        val comic: Comic = currentComics[key]!!
-                        if (comic != c) {
-                            comic.title = c.title
-                            comic.availability = c.availability
-                            comicsDAO.updateComic(comic)
+                        if(overwriteExisting)
+                        {
+                            val comic: Comic = currentComics[key]!!
+                            if (comic != c) {
+                                comic.title = c.title
+                                comic.availability = c.availability
+                                comicsDAO.updateComic(comic)
+                            }
                         }
                     } else {
                         series.comics.add(c)
@@ -70,7 +74,6 @@ class AsyncImporter(
                     comicsDAO.addExistingComic(c)
                 }
             }
-
             activity.runOnUiThread {
                 progressDialog.setProgress(progress)
             }
