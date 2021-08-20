@@ -6,8 +6,10 @@ import android.os.Bundle
 import android.widget.RadioGroup
 import androidx.fragment.app.DialogFragment
 import mcervini.comicslist.R
+import mcervini.comicslist.io.backup.AsyncImporter
 
-class ImportOptionsDialog(private val onConfirm: (Boolean) -> Unit) : DialogFragment() {
+class ImportOptionsDialog(private val onConfirm: (AsyncImporter.ImportMode) -> Unit) :
+    DialogFragment() {
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
@@ -25,9 +27,10 @@ class ImportOptionsDialog(private val onConfirm: (Boolean) -> Unit) : DialogFrag
                 .setPositiveButton(R.string.ok) { _, _ ->
                     onConfirm(
                         when (radioGroup.checkedRadioButtonId) {
-                            R.id.keepRadioButton -> false
-                            R.id.overwriteRadioButton -> true
-                            else -> true
+                            R.id.keepRadioButton -> AsyncImporter.ImportMode.KEEP
+                            R.id.overwriteRadioButton -> AsyncImporter.ImportMode.OVERWRITE
+                            R.id.ReplaceRadioButton -> AsyncImporter.ImportMode.REPLACE
+                            else -> throw IllegalStateException()
                         }
                     )
                 }

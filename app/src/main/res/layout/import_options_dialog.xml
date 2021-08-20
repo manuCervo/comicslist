@@ -1,23 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/importOptionsRadioGroup"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <RadioGroup
-        android:id="@+id/importOptionsRadioGroup"
+    <RadioButton
+        android:id="@+id/overwriteRadioButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:text="@string/overwrite_existing" />
 
-        <RadioButton
-            android:id="@+id/overwriteRadioButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/overwrite_existing" />
+    <RadioButton
+        android:id="@+id/keepRadioButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/keep_existing" />
 
-        <RadioButton
-            android:id="@+id/keepRadioButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/keep_existing" />
-    </RadioGroup>
-</LinearLayout>
+    <RadioButton
+        android:id="@+id/ReplaceRadioButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/delete_everything_and_replace_with_backup" />
+</RadioGroup>

@@ -21,7 +21,6 @@ class DatabaseTest {
 
         val dao = SqliteSeriesDAO(appContext)
 
-
         val series: MutableList<Series> = mutableListOf()
         for (i in 1..10) {
             series.add(dao.createNewSeries("series$i", 5, Availability.BOOKED))

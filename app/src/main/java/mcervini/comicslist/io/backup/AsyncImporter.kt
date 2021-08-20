@@ -22,7 +22,7 @@ class AsyncImporter(
     private val comicsDAO: ComicsDAO,
     private val adapter: SeriesListAdapter,
     executor: Executor,
-    private val overwriteExisting: Boolean = true
+    private val mode: ImportMode = ImportMode.OVERWRITE
 ) : BackgroundTask(
     activity, executor,
     R.string.importing_backup
@@ -56,8 +56,29 @@ class AsyncImporter(
 
         val imported: List<Series> = result.getOrThrow()
 
+        activity.runOnUiThread {
+            progressDialog.setMax(imported.size)
+            progressDialog.setIndeterminate(false)
+        }
+
+        when (mode) {
+            ImportMode.OVERWRITE -> overWriteExisting(imported)
+            ImportMode.KEEP -> keepExisting(imported)
+            ImportMode.REPLACE -> replace(imported)
+        }
+        activity.runOnUiThread { adapter.notifyDataSetChanged() }
+    }
+
+    private fun updateProgress(progress: Int) {
+        activity.runOnUiThread {
+            progressDialog.setProgress(progress)
+        }
+    }
+
+    private fun listToMaps(): Pair<Map<UUID, Series>, Map<Pair<UUID, Int>, Comic>> {
         val currentSeries = mutableMapOf<UUID, Series>()
         val currentComics = mutableMapOf<Pair<UUID, Int>, Comic>()
+
 
         for (s in list) {
             currentSeries[s.id] = s
@@ -65,18 +86,47 @@ class AsyncImporter(
                 currentComics[Pair(s.id, c.number)] = c
             }
         }
+        return Pair(currentSeries, currentComics)
+    }
 
-        activity.runOnUiThread {
-            progressDialog.setMax(imported.size)
-            progressDialog.setIndeterminate(false)
+    private fun keepExisting(imported: List<Series>) {
+        val (currentSeries, currentComics) = listToMaps()
+
+        for ((progress, s) in imported.withIndex()) {
+
+            val seriesId: UUID = s.id
+            val series: Series? = currentSeries[seriesId]
+
+            if (series != null) {
+                for (c in s.comics) {
+                    val key = Pair(seriesId, c.number)
+                    val comic: Comic? = currentComics[key]
+                    if (comic == null) {
+                        series.comics.add(c)
+                        comicsDAO.addExistingComic(c)
+                    }
+                }
+            } else {
+                seriesDAO.addExistingSeries(s)
+                list.add(s)
+                for (c in s.comics) {
+                    comicsDAO.addExistingComic(c)
+                }
+            }
+
+            updateProgress(progress)
         }
 
+    }
+
+    private fun overWriteExisting(imported: List<Series>) {
+        val (currentSeries, currentComics) = listToMaps()
         for ((progress, s) in imported.withIndex()) {
             val seriesId: UUID = s.id
             val series: Series? = currentSeries[seriesId]
 
             if (series != null) {
-                if (overwriteExisting && series != s) {
+                if (series != s) {
                     series.name = s.name
                     seriesDAO.updateSeries(series)
                 }
@@ -86,11 +136,9 @@ class AsyncImporter(
                     val comic: Comic? = currentComics[key]
 
                     if (comic != null) {
-                        if (overwriteExisting) {
-                            comic.title = c.title
-                            comic.availability = c.availability
-                            comicsDAO.updateComic(comic)
-                        }
+                        comic.title = c.title
+                        comic.availability = c.availability
+                        comicsDAO.updateComic(comic)
                     } else {
                         series.comics.add(c)
                         comicsDAO.addExistingComic(c)
@@ -104,12 +152,31 @@ class AsyncImporter(
                     comicsDAO.addExistingComic(c)
                 }
             }
-
-            activity.runOnUiThread {
-                progressDialog.setProgress(progress)
-            }
+            updateProgress(progress)
         }
-        activity.runOnUiThread { adapter.notifyDataSetChanged() }
+    }
+
+    private fun replace(imported: List<Series>) {
+        for (s in list) {
+            seriesDAO.deleteSeries(s)
+        }
+
+        list.clear()
+        list.addAll(imported)
+
+        for ((progress, s) in list.withIndex()) {
+            seriesDAO.addExistingSeries(s)
+            for (c in s.comics) {
+                comicsDAO.addExistingComic(c)
+            }
+            updateProgress(progress)
+        }
+    }
+
+    enum class ImportMode {
+        OVERWRITE,
+        KEEP,
+        REPLACE
     }
 }
 

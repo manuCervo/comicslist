@@ -194,7 +194,7 @@ class ListActivity : AppCompatActivity() {
     private fun importBackup(uri: Uri) {
         val importer = JsonImporter(uri, contentResolver)
 
-        if (list.size == 0) {
+        fun startImporting(importMode: AsyncImporter.ImportMode = AsyncImporter.ImportMode.OVERWRITE) {
             AsyncImporter(
                 importer,
                 this,
@@ -202,20 +202,16 @@ class ListActivity : AppCompatActivity() {
                 seriesDAO,
                 comicsDAO,
                 seriesListAdapter,
-                executor
+                executor,
+                importMode
             ).run()
+        }
+
+        if (list.size == 0) {
+            startImporting()
         } else {
-            ImportOptionsDialog { overwrite ->
-                AsyncImporter(
-                    importer,
-                    this,
-                    list,
-                    seriesDAO,
-                    comicsDAO,
-                    seriesListAdapter,
-                    executor,
-                    overwrite
-                ).run()
+            ImportOptionsDialog { importMode ->
+                startImporting(importMode)
             }.show(supportFragmentManager, "ImportOptions")
         }
     }
