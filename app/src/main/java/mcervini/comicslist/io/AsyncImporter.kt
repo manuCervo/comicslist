@@ -18,7 +18,7 @@ class AsyncImporter(
     private val comicsDAO: ComicsDAO,
     private val adapter: SeriesListAdapter,
     executor: Executor,
-    private val overwriteExisting:Boolean = true
+    private val overwriteExisting: Boolean = true
 ) : BackgroundTask(
     activity, executor,
     R.string.importing_backup
@@ -43,8 +43,9 @@ class AsyncImporter(
 
         for ((progress, s) in imported.withIndex()) {
             val seriesId: UUID = s.id
-            if (currentSeries.containsKey(seriesId)) {
-                val series: Series = currentSeries[seriesId]!!
+            val series: Series? = currentSeries[seriesId]
+
+            if (series != null) {
                 if (overwriteExisting && series != s) {
                     series.name = s.name
                     seriesDAO.updateSeries(series)
@@ -52,21 +53,20 @@ class AsyncImporter(
 
                 for (c in s.comics) {
                     val key = Pair(seriesId, c.number)
-                    if (currentComics.containsKey(key)) {
-                        if(overwriteExisting)
-                        {
-                            val comic: Comic = currentComics[key]!!
-                            if (comic != c) {
-                                comic.title = c.title
-                                comic.availability = c.availability
-                                comicsDAO.updateComic(comic)
-                            }
+                    val comic: Comic? = currentComics[key]
+
+                    if (comic != null) {
+                        if (overwriteExisting) {
+                            comic.title = c.title
+                            comic.availability = c.availability
+                            comicsDAO.updateComic(comic)
                         }
                     } else {
                         series.comics.add(c)
                         comicsDAO.addExistingComic(c)
                     }
                 }
+
             } else {
                 seriesDAO.addExistingSeries(s)
                 list.add(s)
@@ -74,6 +74,7 @@ class AsyncImporter(
                     comicsDAO.addExistingComic(c)
                 }
             }
+
             activity.runOnUiThread {
                 progressDialog.setProgress(progress)
             }

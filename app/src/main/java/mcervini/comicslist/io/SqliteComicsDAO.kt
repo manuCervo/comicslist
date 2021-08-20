@@ -58,11 +58,13 @@ class SqliteComicsDAO(private val context: Context) : ComicsDAO {
     }
 
     private fun comicToContentValues(comic: Comic): ContentValues {
-        val values: ContentValues = ContentValues()
-        values.put("series_id", comic.series.id.toString())
-        values.put("number", comic.number)
-        values.put("title", comic.title)
-        values.put("availability", comic.availability.value)
-        return values
+
+        return ContentValues().apply {
+            put("series_id", comic.series.id.toString())
+            put("number", comic.number)
+            put("title", comic.title)
+            put("availability", comic.availability.value)
+        }
+
     }
 }

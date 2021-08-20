@@ -5,7 +5,6 @@ import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import mcervini.comicslist.BuildConfig
 
 class Database(private val context: Context) :
     SQLiteOpenHelper(context, DATABASE_NAME, null, DATABASE_VERSION) {
@@ -15,34 +14,39 @@ class Database(private val context: Context) :
     }
 
     override fun onCreate(db: SQLiteDatabase?) {
-        db?.execSQL(
-            """
-            CREATE TABLE series (
-                id TEXT PRIMARY KEY,
-                name TEXT NOT NULL CHECK(name <> '')
-            )
-        """.trimIndent()
-        )
+        db?.run {
 
-        db?.execSQL(
-            """
-            CREATE TABLE comic(
-                number INTEGER,
-                series_id TEXT,
-                title TEXT,
-                availability INTEGER NOT NULL CHECK(availability >= 0 AND availability <=2),
-                PRIMARY KEY(series_id,number),
-                FOREIGN KEY(series_id) references series(id) ON DELETE CASCADE ON UPDATE CASCADE
-                
+            execSQL(
+                """
+                CREATE TABLE series (
+                    id TEXT PRIMARY KEY,
+                    name TEXT NOT NULL CHECK(name <> '')
+                )
+                """.trimIndent()
             )
-        """.trimIndent()
-        )
+
+            execSQL(
+                """
+                CREATE TABLE comic(
+                    number INTEGER,
+                    series_id TEXT,
+                    title TEXT,
+                    availability INTEGER NOT NULL CHECK(availability >= 0 AND availability <=2),
+                    PRIMARY KEY(series_id,number),
+                    FOREIGN KEY(series_id) references series(id) ON DELETE CASCADE ON UPDATE CASCADE    
+                )
+                """.trimIndent()
+            )
+        }
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, p1: Int, p2: Int) {
-        db?.execSQL("DROP TABLE comic")
-        db?.execSQL("DROP TABLE series")
-        onCreate(db)
+        db?.run {
+            execSQL("DROP TABLE comic")
+            execSQL("DROP TABLE series")
+            onCreate(this)
+        }
+
     }
 
     fun query(table: String, columns: Array<String>?, selection: String): Cursor {
@@ -62,9 +66,7 @@ class Database(private val context: Context) :
 
     fun update(table: String, values: ContentValues, where: String) {
         val db: SQLiteDatabase = writableDatabase
-        val affected: Int = db.update(table, values, where, null)
-        if (BuildConfig.DEBUG && affected == 0) {
-            error("Assertion failed")
-        }
+        db.update(table, values, where, null)
+
     }
 }

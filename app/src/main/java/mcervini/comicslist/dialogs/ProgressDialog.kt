@@ -3,7 +3,6 @@ package mcervini.comicslist.dialogs
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.ProgressBar
 import androidx.annotation.StringRes
@@ -16,21 +15,23 @@ class ProgressDialog(@StringRes private val title: Int) : DialogFragment() {
     private lateinit var progressBar: ProgressBar
     private var showing = false
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        if (activity == null) {
-            throw IllegalStateException("activity is null")
-        }
-        val inflater: LayoutInflater = LayoutInflater.from(requireContext())
-        val view: View = inflater.inflate(R.layout.progress_dialog, null)
-        progressBar = view.findViewById(R.id.progressBar)
-        progressBar.isIndeterminate = true
+        return activity?.let {
 
-        val dialog = AlertDialog.Builder(requireContext())
-            .setView(view)
-            .setCancelable(false)
-            .setTitle(title)
-            .create()
-        dialog.setCanceledOnTouchOutside(false)
-        return dialog
+            val view: View = it.layoutInflater.inflate(R.layout.progress_dialog, null)
+
+            progressBar = view.findViewById<ProgressBar>(R.id.progressBar).apply {
+                isIndeterminate = true
+            }
+
+            AlertDialog.Builder(requireContext())
+                .setView(view)
+                .setCancelable(false)
+                .setTitle(title)
+                .create()
+                .apply {
+                    setCanceledOnTouchOutside(false)
+                }
+        } ?: throw IllegalStateException("activity is null")
     }
 
 

@@ -27,7 +27,6 @@ class AsyncExporter(
         Toast.makeText(
             activity.applicationContext,
             R.string.comics_exported, Toast.LENGTH_SHORT
-        )
-            .show()
+        ).show()
     }
 }

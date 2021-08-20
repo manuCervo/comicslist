@@ -11,39 +11,44 @@ class JsonExporter(private val stream: OutputStream) {
 
     fun export(series: MutableList<Series>) {
         val writer: JsonWriter = JsonWriter(OutputStreamWriter(stream))
-
-        writer.beginArray()
-        for (s in series) {
-            writeSeries(writer, s)
+        writer.run {
+            beginArray()
+            for (s in series) {
+                writeSeries(this, s)
+            }
+            endArray()
+            close()
         }
-        writer.endArray()
-        writer.close()
     }
 
     private fun writeSeries(writer: JsonWriter, series: Series) {
-        writer.beginObject()
-        writer.name("id")
-        writer.value(series.id.toString())
-        writer.name("name")
-        writer.value(series.name)
-        writer.name("comics")
-        writer.beginArray()
-        for (c in series.comics) {
-            writeComic(writer, c)
+        writer.run {
+            beginObject()
+            name("id")
+            value(series.id.toString())
+            name("name")
+            value(series.name)
+            name("comics")
+            beginArray()
+            for (c in series.comics) {
+                writeComic(this, c)
+            }
+            endArray()
+            endObject()
         }
-        writer.endArray()
-        writer.endObject()
     }
 
     private fun writeComic(writer: JsonWriter, c: Comic) {
-        writer.beginObject()
-        writer.name("number")
-        writer.value(c.number)
-        writer.name("title")
-        writer.value(c.title)
-        writer.name("availability")
-        writer.value(c.availability.value)
-        writer.endObject()
+        writer.run {
+            beginObject()
+            name("number")
+            value(c.number)
+            name("title")
+            value(c.title)
+            name("availability")
+            value(c.availability.value)
+            endObject()
+        }
     }
 
 

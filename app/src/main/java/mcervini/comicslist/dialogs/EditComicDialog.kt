@@ -4,16 +4,14 @@ import mcervini.comicslist.Availability
 import mcervini.comicslist.Comic
 import mcervini.comicslist.R
 
-class EditComicDialogFragment(
+class EditComicDialog(
     private val currentData: Comic,
     private val onConfirm: (String, Int, Availability, Boolean) -> Unit
-) : InsertComicDialogFragment(R.string.edit_comic) {
+) : InsertComicDialog(R.string.edit_comic) {
 
     override fun onDialogConfirmed(number: Int, title: String, availability: Availability) {
-        var numberChanged = false
-        if (number != currentData.number) {
-            numberChanged = true
-        }
+
+        val numberChanged = number != currentData.number
 
         if (title != currentData.title || availability != currentData.availability || numberChanged) {
             onConfirm(title, number, availability, numberChanged)

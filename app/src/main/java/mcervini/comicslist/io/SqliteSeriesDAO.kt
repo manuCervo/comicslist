@@ -78,9 +78,9 @@ class SqliteSeriesDAO(val context: Context) : SeriesDAO {
     }
 
     private fun seriesToContentValues(series: Series): ContentValues {
-        val contentValues: ContentValues = ContentValues()
-        contentValues.put("name", series.name)
-        contentValues.put("id", series.id.toString())
-        return contentValues
+        return ContentValues().apply {
+            put("name", series.name)
+            put("id", series.id.toString())
+        }
     }
 }

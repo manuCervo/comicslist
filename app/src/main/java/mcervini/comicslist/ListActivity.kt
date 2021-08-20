@@ -17,6 +17,7 @@ import mcervini.comicslist.io.AsyncExporter
 import mcervini.comicslist.io.AsyncImporter
 import mcervini.comicslist.io.SqliteComicsDAO
 import mcervini.comicslist.io.SqliteSeriesDAO
+import java.io.InputStream
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
@@ -73,10 +74,11 @@ class ListActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_add -> NewSeriesDialogFragment(onNewSeriesEntered).show(
+            R.id.menu_add -> NewSeriesDialog(onNewSeriesEntered).show(
                 supportFragmentManager,
                 "dialog"
             )
+
             R.id.menu_make_backup -> {
                 val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
@@ -100,6 +102,7 @@ class ListActivity : AppCompatActivity() {
         val info = item.menuInfo as SeriesRecyclerView.ContextMenuInfo
 
         val series: Series = list[info.position]
+
         val comic: Comic? = if (info.nestedPosition != -1) {
             series.comics[info.nestedPosition]
         } else {
@@ -119,39 +122,36 @@ class ListActivity : AppCompatActivity() {
 
             R.id.menu_edit -> {
                 if (comic == null) {
-                    EditSeriesDialogFragment(series) { newName: String ->
-                        onEditSeriesConfirm(
-                            series,
-                            newName
-                        )
-                    }
-                        .show(supportFragmentManager, "editDialog")
+                    EditSeriesDialog(series) { newName: String ->
+                        onEditSeriesConfirm(series, newName)
+                    }.show(supportFragmentManager, "editDialog")
                 } else {
-                    EditComicDialogFragment(comic) { title: String, number: Int, availability: Availability, numberChanged: Boolean ->
+                    EditComicDialog(comic) { title: String, number: Int, availability: Availability, numberChanged: Boolean ->
                         onEditComicConfirm(comic, title, number, availability, numberChanged)
                     }.show(supportFragmentManager, "editDialog")
                 }
             }
 
             R.id.menu_new_comic ->
-                NewComicDialogFragment(series) { number: Int, title: String, availability: Availability ->
+                NewComicDialog(series) { number: Int, title: String, availability: Availability ->
                     listUpdater.createComic(series, number, title, availability)
                 }.show(supportFragmentManager, "newComic")
         }
         return true
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when (requestCode) {
-            MAKE_BACKUP -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    onFragmentResumeAction = { makeBackup(data?.data!!) }
-                }
-            }
-            IMPORT_BACKUP -> {
-                if (resultCode == Activity.RESULT_OK) {
-                    onFragmentResumeAction = { importBackup(data?.data!!) }
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intent)
+
+        if (resultCode == Activity.RESULT_OK) {
+            intent?.data?.let { uri ->
+                when (requestCode) {
+                    MAKE_BACKUP -> {
+                        onFragmentResumeAction = { makeBackup(uri) }
+                    }
+                    IMPORT_BACKUP -> {
+                        onFragmentResumeAction = { importBackup(uri) }
+                    }
                 }
             }
         }
@@ -159,8 +159,8 @@ class ListActivity : AppCompatActivity() {
 
     override fun onResumeFragments() {
         super.onResumeFragments()
-        if (onFragmentResumeAction != null) {
-            onFragmentResumeAction?.invoke()
+        onFragmentResumeAction?.let { onResumeAction ->
+            onResumeAction()
             onFragmentResumeAction = null
         }
     }
@@ -191,10 +191,12 @@ class ListActivity : AppCompatActivity() {
     }
 
     private fun importBackup(uri: Uri) {
+        val stream: InputStream = applicationContext.contentResolver.openInputStream(uri)!!
+
         if (list.size == 0) {
             AsyncImporter(
                 this,
-                applicationContext.contentResolver.openInputStream(uri)!!,
+                stream,
                 list,
                 seriesDAO,
                 comicsDAO,
@@ -205,7 +207,7 @@ class ListActivity : AppCompatActivity() {
             ImportOptionsDialog { overwrite ->
                 AsyncImporter(
                     this,
-                    applicationContext.contentResolver.openInputStream(uri)!!,
+                    stream,
                     list,
                     seriesDAO,
                     comicsDAO,
