@@ -1,10 +1,11 @@
 package mcervini.comicslist
 
 import android.content.Context
+import android.net.Uri
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import mcervini.comicslist.io.JsonExporter
-import mcervini.comicslist.io.JsonImporter
+import mcervini.comicslist.io.backup.JsonExporter
+import mcervini.comicslist.io.backup.JsonImporter
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
@@ -19,7 +20,8 @@ class JsonTest {
     @Test
     fun testWrite() {
 
-        val file: File = File(context.getExternalFilesDir(null), "testWrite.json")
+        val file = File(context.getExternalFilesDir(null), "testWrite.json")
+        val uri:Uri = Uri.fromFile(file)
 
         val series1 = Series(UUID.fromString("9d03c7cd-fc09-485d-8c7d-8531cc9b7e89"), "series1")
         for (i in 1..3) {
@@ -35,7 +37,7 @@ class JsonTest {
 
         val series: MutableList<Series> = mutableListOf(series1, series2, series3)
 
-        val jsonExporter = JsonExporter(file.outputStream())
+        val jsonExporter = JsonExporter(uri,context.contentResolver)
 
         jsonExporter.export(series)
 
@@ -53,9 +55,9 @@ class JsonTest {
         val writer: FileWriter = FileWriter(file)
         writer.write(json)
         writer.close()
-        val jsonImporter: JsonImporter = JsonImporter(file.inputStream())
+        val jsonImporter: JsonImporter = JsonImporter(Uri.fromFile(file),context.contentResolver)
 
-        val series: MutableList<Series> = jsonImporter.import()
+        val series: List<Series> = jsonImporter.import()
 
         val series1 = Series(UUID.fromString("9d03c7cd-fc09-485d-8c7d-8531cc9b7e89"), "series1")
         for (i in 1..3) {

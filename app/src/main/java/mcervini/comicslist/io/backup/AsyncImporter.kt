@@ -1,18 +1,22 @@
-package mcervini.comicslist.io
+package mcervini.comicslist.io.backup
 
+import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import mcervini.comicslist.BackgroundTask
 import mcervini.comicslist.Comic
 import mcervini.comicslist.R
 import mcervini.comicslist.Series
 import mcervini.comicslist.adapters.SeriesListAdapter
-import java.io.InputStream
+import mcervini.comicslist.io.ComicsDAO
+import mcervini.comicslist.io.SeriesDAO
+import java.io.IOException
 import java.util.*
 import java.util.concurrent.Executor
 
 class AsyncImporter(
+    private val importer: Importer,
     activity: AppCompatActivity,
-    private val stream: InputStream,
     private val list: MutableList<Series>,
     private val seriesDAO: SeriesDAO,
     private val comicsDAO: ComicsDAO,
@@ -24,7 +28,33 @@ class AsyncImporter(
     R.string.importing_backup
 ) {
     override fun doTask() {
-        val imported: MutableList<Series> = JsonImporter(stream).import()
+        val result: Result<List<Series>> = importer.runCatching {
+            import()
+        }
+
+        if (result.isFailure) {
+            @StringRes val error: Int = when (result.exceptionOrNull() as Exception) {
+                is IOException -> {
+                    R.string.cant_read_file
+                }
+                is Importer.MissingDataException -> {
+                    R.string.import_missing_data
+                }
+                else -> {
+                    R.string.import_error_generic
+                }
+            }
+            activity.runOnUiThread {
+                Toast.makeText(
+                    activity.applicationContext,
+                    error,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            return
+        }
+
+        val imported: List<Series> = result.getOrThrow()
 
         val currentSeries = mutableMapOf<UUID, Series>()
         val currentComics = mutableMapOf<Pair<UUID, Int>, Comic>()
@@ -79,9 +109,7 @@ class AsyncImporter(
                 progressDialog.setProgress(progress)
             }
         }
-    }
-
-    override fun afterTask() {
-        adapter.notifyDataSetChanged()
+        activity.runOnUiThread { adapter.notifyDataSetChanged() }
     }
 }
+

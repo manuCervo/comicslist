@@ -1,18 +1,26 @@
-package mcervini.comicslist.io
+package mcervini.comicslist.io.backup
 
+import android.content.ContentResolver
+import android.net.Uri
 import android.util.JsonReader
 import mcervini.comicslist.Availability
 import mcervini.comicslist.Comic
 import mcervini.comicslist.Series
-import java.io.InputStream
+import mcervini.comicslist.io.backup.JsonKeys.Companion.COMIC_AVAILABILITY
+import mcervini.comicslist.io.backup.JsonKeys.Companion.COMIC_NUMBER
+import mcervini.comicslist.io.backup.JsonKeys.Companion.COMIC_TITLE
+import mcervini.comicslist.io.backup.JsonKeys.Companion.SERIES_COMICS
+import mcervini.comicslist.io.backup.JsonKeys.Companion.SERIES_ID
+import mcervini.comicslist.io.backup.JsonKeys.Companion.SERIES_NAME
 import java.io.InputStreamReader
 import java.util.*
 
-class JsonImporter(private val stream: InputStream) {
+class JsonImporter(private val uri: Uri, private val contentResolver: ContentResolver) : Importer {
     private class ComicData(val number: Int, val title: String, val availability: Availability)
 
-    fun import(): MutableList<Series> {
-        val reader: JsonReader = JsonReader(InputStreamReader(stream))
+
+    override fun import(): List<Series> {
+        val reader: JsonReader = JsonReader(InputStreamReader(contentResolver.openInputStream(uri)))
         val series: MutableList<Series> = mutableListOf()
 
         return reader.run {
@@ -36,9 +44,9 @@ class JsonImporter(private val stream: InputStream) {
             beginObject()
             while (hasNext()) {
                 when (nextName()) {
-                    "id" -> id = UUID.fromString(nextString())
-                    "name" -> name = nextString().takeUnless { it.isNullOrBlank() }
-                    "comics" -> {
+                    SERIES_ID -> id = UUID.fromString(nextString())
+                    SERIES_NAME -> name = nextString().takeUnless { it.isNullOrBlank() }
+                    SERIES_COMICS -> {
                         beginArray()
                         while (hasNext()) {
                             comicsData.add(readComic(this))
@@ -68,9 +76,9 @@ class JsonImporter(private val stream: InputStream) {
             beginObject()
             while (hasNext()) {
                 when (nextName()) {
-                    "number" -> number = nextInt()
-                    "title" -> title = nextString()
-                    "availability" -> availability = Availability.fromValue(nextInt())
+                    COMIC_NUMBER -> number = nextInt()
+                    COMIC_TITLE -> title = nextString()
+                    COMIC_AVAILABILITY -> availability = Availability.fromValue(nextInt())
                 }
             }
 

@@ -34,4 +34,8 @@
     <string name="importing_backup">importing backup…</string>
     <string name="overwrite_existing">overwrite existing</string>
     <string name="keep_existing">keep existing</string>
+    <string name="cant_read_file">can\'t read file</string>
+    <string name="import_missing_data">the file has missing data</string>
+    <string name="import_error_generic">an error occured while importing</string>
+    <string name="cant_write_file">an error occured while writing to file</string>
 </resources>

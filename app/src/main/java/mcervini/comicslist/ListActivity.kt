@@ -13,11 +13,12 @@ import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_list.*
 import mcervini.comicslist.adapters.SeriesListAdapter
 import mcervini.comicslist.dialogs.*
-import mcervini.comicslist.io.AsyncExporter
-import mcervini.comicslist.io.AsyncImporter
 import mcervini.comicslist.io.SqliteComicsDAO
 import mcervini.comicslist.io.SqliteSeriesDAO
-import java.io.InputStream
+import mcervini.comicslist.io.backup.AsyncExporter
+import mcervini.comicslist.io.backup.AsyncImporter
+import mcervini.comicslist.io.backup.JsonExporter
+import mcervini.comicslist.io.backup.JsonImporter
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
@@ -191,12 +192,12 @@ class ListActivity : AppCompatActivity() {
     }
 
     private fun importBackup(uri: Uri) {
-        val stream: InputStream = applicationContext.contentResolver.openInputStream(uri)!!
+        val importer = JsonImporter(uri, contentResolver)
 
         if (list.size == 0) {
             AsyncImporter(
+                importer,
                 this,
-                stream,
                 list,
                 seriesDAO,
                 comicsDAO,
@@ -206,8 +207,8 @@ class ListActivity : AppCompatActivity() {
         } else {
             ImportOptionsDialog { overwrite ->
                 AsyncImporter(
+                    importer,
                     this,
-                    stream,
                     list,
                     seriesDAO,
                     comicsDAO,
@@ -222,7 +223,7 @@ class ListActivity : AppCompatActivity() {
     private fun makeBackup(uri: Uri) {
         AsyncExporter(
             list,
-            applicationContext.contentResolver.openOutputStream(uri)!!,
+            JsonExporter(uri, contentResolver),
             this,
             executor
         ).run()

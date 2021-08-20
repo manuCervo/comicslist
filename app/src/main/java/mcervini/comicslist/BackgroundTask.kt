@@ -14,12 +14,10 @@ abstract class BackgroundTask(
         executor.execute {
             doTask()
             activity.runOnUiThread {
-                afterTask()
                 progressDialog.dismiss()
             }
         }
     }
 
-    abstract fun doTask()
-    abstract fun afterTask()
+    protected abstract fun doTask()
 }
