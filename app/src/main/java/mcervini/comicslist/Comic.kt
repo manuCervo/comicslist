@@ -6,7 +6,7 @@ data class Comic(
     var number: Int,
     var title: String,
     var availability: Availability
-) {
+) : Comparable<Comic> {
 
 
     override fun toString(): String {
@@ -26,5 +26,9 @@ data class Comic(
         result = 31 * result + title.hashCode()
         result = 31 * result + availability.hashCode()
         return result
+    }
+
+    override fun compareTo(other: Comic): Int {
+        return number.compareTo(other.number)
     }
 }

@@ -6,14 +6,14 @@ data class Series(
     val id: UUID,
     var name: String,
     val comics: MutableList<Comic> = mutableListOf()
-) {
+) : Comparable<Series> {
     override fun toString(): String {
         return "Series(id=$id, name='$name', comicsCount=${comics.size})"
     }
 
     override fun equals(other: Any?): Boolean {
         if (other != null && other is Series) {
-            return other.id.equals(this.id) && other.name.equals(this.name)
+            return other.id == this.id && other.name == this.name
         }
         return super.equals(other)
     }
@@ -23,5 +23,10 @@ data class Series(
         result = 31 * result + name.hashCode()
         result = 31 * result + comics.hashCode()
         return result
+    }
+
+
+    override fun compareTo(other: Series): Int {
+        return name.compareTo(other.name)
     }
 }

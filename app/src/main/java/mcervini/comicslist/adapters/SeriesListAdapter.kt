@@ -6,15 +6,16 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SortedList
 import mcervini.comicslist.R
 import mcervini.comicslist.Series
 
-class SeriesListAdapter(private val list: MutableList<Series>) :
+class SeriesListAdapter(private val list: SortedList<Series>) :
     RecyclerView.Adapter<SeriesListAdapter.SeriesViewHolder>() {
     private val resource = R.layout.listitem_series
 
     override fun getItemCount(): Int {
-        return list.size
+        return list.size()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SeriesViewHolder {
@@ -29,6 +30,7 @@ class SeriesListAdapter(private val list: MutableList<Series>) :
         holder.comicsRecyclerView.adapter = ComicsListAdapter(series.comics)
 
     }
+
 
     class SeriesViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val seriesNameTextView: TextView = view.findViewById(R.id.seriesNameTextView)

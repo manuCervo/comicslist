@@ -3,11 +3,11 @@ package mcervini.comicslist.io.backup
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.SortedList
 import mcervini.comicslist.BackgroundTask
 import mcervini.comicslist.Comic
 import mcervini.comicslist.R
 import mcervini.comicslist.Series
-import mcervini.comicslist.adapters.SeriesListAdapter
 import mcervini.comicslist.io.ComicsDAO
 import mcervini.comicslist.io.SeriesDAO
 import java.io.IOException
@@ -15,13 +15,13 @@ import java.util.*
 import java.util.concurrent.Executor
 
 class AsyncImporter(
-    private val importer: Importer,
     activity: AppCompatActivity,
-    private val list: MutableList<Series>,
+    executor: Executor,
+    private val importer: Importer,
     private val seriesDAO: SeriesDAO,
     private val comicsDAO: ComicsDAO,
-    private val adapter: SeriesListAdapter,
-    executor: Executor,
+    private val list: MutableList<Series>,
+    private val displayingList: SortedList<Series>,
     private val mode: ImportMode = ImportMode.OVERWRITE
 ) : BackgroundTask(
     activity, executor,
@@ -66,7 +66,12 @@ class AsyncImporter(
             ImportMode.KEEP -> keepExisting(imported)
             ImportMode.REPLACE -> replace(imported)
         }
-        activity.runOnUiThread { adapter.notifyDataSetChanged() }
+        activity.runOnUiThread {
+            displayingList.beginBatchedUpdates()
+            displayingList.clear()
+            displayingList.addAll(list)
+            displayingList.endBatchedUpdates()
+        }
     }
 
     private fun updateProgress(progress: Int) {

@@ -4,12 +4,15 @@ import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.ContextMenu
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.SearchView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.SortedList
 import kotlinx.android.synthetic.main.activity_list.*
 import mcervini.comicslist.adapters.SeriesListAdapter
 import mcervini.comicslist.dialogs.*
@@ -24,11 +27,12 @@ import java.util.concurrent.Executors
 
 class ListActivity : AppCompatActivity() {
 
-    lateinit var list: MutableList<Series>
-    lateinit var seriesDAO: SqliteSeriesDAO
-    lateinit var seriesListAdapter: SeriesListAdapter
-    lateinit var comicsDAO: SqliteComicsDAO
-    lateinit var listUpdater: ListUpdater
+    private lateinit var list: MutableList<Series>
+    private lateinit var displayingList: SortedList<Series>
+    private lateinit var seriesDAO: SqliteSeriesDAO
+    private lateinit var seriesListAdapter: SeriesListAdapter
+    private lateinit var comicsDAO: SqliteComicsDAO
+    private lateinit var dataUpdater: DataUpdater
 
     private val executor: Executor = Executors.newSingleThreadExecutor()
     private var onFragmentResumeAction: (() -> Unit)? = null
@@ -38,26 +42,36 @@ class ListActivity : AppCompatActivity() {
         private const val IMPORT_BACKUP = 1
     }
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
         seriesDAO = SqliteSeriesDAO(applicationContext)
         comicsDAO = SqliteComicsDAO(applicationContext)
-
         list = seriesDAO.getAllSeries()
-        seriesListAdapter = SeriesListAdapter(list)
 
+        displayingList = SortedList(Series::class.java, sortedListCallback)
+        seriesListAdapter = SeriesListAdapter(displayingList)
         comicsRecyclerView.adapter = seriesListAdapter
-
-
-        listUpdater = ListUpdater(seriesDAO, comicsDAO, seriesListAdapter, list)
-
         registerForContextMenu(comicsRecyclerView)
+
+        dataUpdater = DataUpdater(seriesDAO, comicsDAO, list, displayingList)
+        displayingList.addAll(list)
+
+        addSeriesFAB.setOnClickListener {
+            NewSeriesDialog(onNewSeriesEntered).show(supportFragmentManager, "NewSeries")
+        }
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.list_menu, menu)
+        menu?.let {
+            val item = it.findItem(R.id.menu_search)
+            val searchView = item.actionView as SearchView
+            searchView.setOnQueryTextListener(queryTextListener)
+        }
         return true
     }
 
@@ -75,11 +89,6 @@ class ListActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
-            R.id.menu_add -> NewSeriesDialog(onNewSeriesEntered).show(
-                supportFragmentManager,
-                "dialog"
-            )
-
             R.id.menu_make_backup -> {
                 val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                     addCategory(Intent.CATEGORY_OPENABLE)
@@ -102,7 +111,7 @@ class ListActivity : AppCompatActivity() {
     override fun onContextItemSelected(item: MenuItem): Boolean {
         val info = item.menuInfo as SeriesRecyclerView.ContextMenuInfo
 
-        val series: Series = list[info.position]
+        val series: Series = displayingList[info.position]
 
         val comic: Comic? = if (info.nestedPosition != -1) {
             series.comics[info.nestedPosition]
@@ -114,9 +123,9 @@ class ListActivity : AppCompatActivity() {
             R.id.menu_delete -> {
                 makeDeleteDialog(comic != null) {
                     if (comic != null) {
-                        listUpdater.deleteComic(comic)
+                        dataUpdater.deleteComic(comic)
                     } else {
-                        listUpdater.deleteSeries(series)
+                        dataUpdater.deleteSeries(series)
                     }
                 }.show()
             }
@@ -135,7 +144,7 @@ class ListActivity : AppCompatActivity() {
 
             R.id.menu_new_comic ->
                 NewComicDialog(series) { number: Int, title: String, availability: Availability ->
-                    listUpdater.createComic(series, number, title, availability)
+                    dataUpdater.createComic(series, number, title, availability)
                 }.show(supportFragmentManager, "newComic")
         }
         return true
@@ -147,12 +156,8 @@ class ListActivity : AppCompatActivity() {
         if (resultCode == Activity.RESULT_OK) {
             intent?.data?.let { uri ->
                 when (requestCode) {
-                    MAKE_BACKUP -> {
-                        onFragmentResumeAction = { makeBackup(uri) }
-                    }
-                    IMPORT_BACKUP -> {
-                        onFragmentResumeAction = { importBackup(uri) }
-                    }
+                    MAKE_BACKUP -> onFragmentResumeAction = { makeBackup(uri) }
+                    IMPORT_BACKUP -> onFragmentResumeAction = { importBackup(uri) }
                 }
             }
         }
@@ -168,7 +173,7 @@ class ListActivity : AppCompatActivity() {
 
     private val onNewSeriesEntered: (String, Int, Availability) -> Unit =
         { name, numberOfComics, availability ->
-            listUpdater.createSeries(name, numberOfComics, availability)
+            dataUpdater.createSeries(name, numberOfComics, availability)
         }
 
     private fun onEditComicConfirm(
@@ -180,15 +185,15 @@ class ListActivity : AppCompatActivity() {
     ) {
         comic.availability = availability
         comic.title = title
-        listUpdater.updateComic(comic)
+        dataUpdater.updateComic(comic)
         if (numberChanged) {
-            listUpdater.updateComicNumber(comic, number)
+            dataUpdater.updateComicNumber(comic, number)
         }
     }
 
     private fun onEditSeriesConfirm(series: Series, newName: String) {
         series.name = newName
-        listUpdater.updateSeries(series)
+        dataUpdater.updateSeries(series)
     }
 
     private fun importBackup(uri: Uri) {
@@ -196,13 +201,13 @@ class ListActivity : AppCompatActivity() {
 
         fun startImporting(importMode: AsyncImporter.ImportMode = AsyncImporter.ImportMode.OVERWRITE) {
             AsyncImporter(
-                importer,
                 this,
-                list,
+                executor,
+                importer,
                 seriesDAO,
                 comicsDAO,
-                seriesListAdapter,
-                executor,
+                list,
+                displayingList,
                 importMode
             ).run()
         }
@@ -238,5 +243,50 @@ class ListActivity : AppCompatActivity() {
             .setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
             .setPositiveButton(R.string.yes) { _, _ -> onConfirm() }
             .create()
+    }
+
+    private val queryTextListener = object : SearchView.OnQueryTextListener {
+        override fun onQueryTextSubmit(p0: String?): Boolean {
+            Log.e("submit", p0 ?: "")
+            return false
+        }
+
+        override fun onQueryTextChange(query: String?): Boolean {
+            Log.e("change", query ?: "")
+            return false
+        }
+    }
+
+    private val sortedListCallback = object : SortedList.Callback<Series>() {
+        override fun compare(o1: Series?, o2: Series?): Int {
+            if (o1 != null && o2 != null) {
+                return o1.compareTo(o2)
+            }
+            return 0
+        }
+
+        override fun onInserted(position: Int, count: Int) {
+            seriesListAdapter.notifyItemRangeInserted(position, count)
+        }
+
+        override fun onRemoved(position: Int, count: Int) {
+            seriesListAdapter.notifyItemRangeRemoved(position, count)
+        }
+
+        override fun onMoved(fromPosition: Int, toPosition: Int) {
+            seriesListAdapter.notifyItemMoved(fromPosition, toPosition)
+        }
+
+        override fun onChanged(position: Int, count: Int) {
+            seriesListAdapter.notifyItemRangeChanged(position, count)
+        }
+
+        override fun areContentsTheSame(oldItem: Series?, newItem: Series?): Boolean {
+            return oldItem == newItem
+        }
+
+        override fun areItemsTheSame(item1: Series?, item2: Series?): Boolean {
+            return item1 === item2
+        }
     }
 }

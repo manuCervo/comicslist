@@ -3,9 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
+        android:id="@+id/menu_search"
+        android:icon="@drawable/ic_search_black_24dp"
+        android:title="Search"
+        app:actionViewClass="android.widget.SearchView"
+        app:showAsAction="always" />
+    <item
         android:icon="@drawable/ic_round_sd_storage_24"
         android:title="@string/backup"
-        app:showAsAction="ifRoom" >
+        app:showAsAction="ifRoom|collapseActionView">
         <menu>
             <item
                 android:id="@+id/menu_make_backup"
@@ -17,9 +23,4 @@
                 android:title="@string/import_backup" />
         </menu>
     </item>
-    <item
-        android:id="@+id/menu_add"
-        android:icon="@drawable/ic_round_add_24"
-        android:title="@string/add"
-        app:showAsAction="always" />
 </menu>
