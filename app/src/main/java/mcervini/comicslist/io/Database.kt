@@ -13,6 +13,7 @@ class Database(private val context: Context) :
         private const val DATABASE_VERSION = 2
     }
 
+
     override fun onCreate(db: SQLiteDatabase?) {
         db?.run {
 
@@ -46,10 +47,14 @@ class Database(private val context: Context) :
             execSQL("DROP TABLE series")
             onCreate(this)
         }
-
     }
 
-    fun query(table: String, columns: Array<String>?, selection: String): Cursor {
+    override fun onOpen(db: SQLiteDatabase?) {
+        super.onOpen(db)
+        db?.execSQL("PRAGMA foreign_keys=ON")
+    }
+
+    fun query(table: String, columns: Array<String>?, selection: String?): Cursor {
         val db: SQLiteDatabase = readableDatabase
         return db.query(table, columns, selection, null, null, null, null)
     }

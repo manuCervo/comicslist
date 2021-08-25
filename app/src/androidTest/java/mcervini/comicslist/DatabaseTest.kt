@@ -24,6 +24,7 @@ class DatabaseTest {
         val series: MutableList<Series> = mutableListOf()
         for (i in 1..10) {
             series.add(dao.createNewSeries("series$i", 5, Availability.BOOKED))
+            series.add(dao.createNewSeries("empty$i", 0, Availability.BOOKED))
         }
         val result: MutableList<Series> = dao.getAllSeries()
 
@@ -36,24 +37,31 @@ class DatabaseTest {
 
         clearDatabase(appContext)
 
-        val dao = SqliteSeriesDAO(appContext)
+        val seriesDAO = SqliteSeriesDAO(appContext)
+        val comicsDAO = SqliteComicsDAO(appContext)
 
         val series: MutableList<Series> = mutableListOf()
+        val comics: MutableList<Comic> = mutableListOf()
         for (i in 1..10) {
-            series.add(dao.createNewSeries("series$i", 5, Availability.BOOKED))
+            series.add(
+                seriesDAO.createNewSeries("series$i", 5, Availability.BOOKED)
+                    .also { comics.addAll(it.comics) })
         }
 
 
         val toDelete = listOf<Series>(series[9], series[5], series[1], series[4], series[7])
 
         for (s in toDelete) {
-            dao.deleteSeries(s)
+            seriesDAO.deleteSeries(s)
             series.remove(s)
+            comics.removeAll(s.comics)
         }
 
-        val result = dao.getAllSeries()
+        val seriesResult = seriesDAO.getAllSeries()
+        val comicsResult = comicsDAO.getAllComics()
 
-        assertSeriesEqual(series, result)
+        assertSeriesEqual(series, seriesResult)
+        assertComicsEquals(comics, comicsResult)
     }
 
     @Test

@@ -25,15 +25,14 @@ class DataUpdater(
 
     fun updateSeries(series: Series) {
         seriesDAO.updateSeries(series)
-        displayingList.updateItemAt(displayingList.indexOf(series), series)
-
+        updateDisplayedSeries(series)
     }
 
     fun createComic(series: Series, number: Int, title: String, availability: Availability): Comic {
         val comic: Comic = comicsDAO.createNewComic(series, number, title, availability)
         series.comics.add(comic)
         series.comics.sort()
-        displayingList.updateItemAt(displayingList.indexOf(series), series)
+        updateDisplayedSeries(comic.series)
         return comic
     }
 
@@ -41,18 +40,25 @@ class DataUpdater(
         comicsDAO.deleteComic(comic)
         comic.series.comics.remove(comic)
         comic.series.comics.sort()
-        displayingList.updateItemAt(displayingList.indexOf(comic.series), comic.series)
+        updateDisplayedSeries(comic.series)
     }
 
     fun updateComic(comic: Comic) {
         comicsDAO.updateComic(comic)
-        displayingList.updateItemAt(displayingList.indexOf(comic.series), comic.series)
+        updateDisplayedSeries(comic.series)
     }
 
     fun updateComicNumber(comic: Comic, newNumber: Int) {
         comicsDAO.updateComicNumber(comic, newNumber)
         comic.number = newNumber
         comic.series.comics.sort()
-        displayingList.updateItemAt(displayingList.indexOf(comic.series), comic.series)
+        updateDisplayedSeries(comic.series)
+    }
+
+    private fun updateDisplayedSeries(series: Series) {
+        val index: Int = displayingList.indexOf(series)
+        if (index != SortedList.INVALID_POSITION) {
+            displayingList.updateItemAt(index, series)
+        }
     }
 }

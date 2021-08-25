@@ -3,6 +3,7 @@ package mcervini.comicslist.io
 import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
+import androidx.core.database.getIntOrNull
 import mcervini.comicslist.Availability
 import mcervini.comicslist.Comic
 import mcervini.comicslist.Series
@@ -15,26 +16,29 @@ class SqliteSeriesDAO(val context: Context) : SeriesDAO {
 
 
     override fun getAllSeries(): MutableList<Series> {
-        val result: Cursor = database.query("series,comic", null, "comic.series_id = series.id")
+        val result: Cursor =
+            database.query("series LEFT JOIN comic ON comic.series_id = series.id", null, null)
         val allSeries: MutableMap<UUID, Series> = mutableMapOf()
 
         while (result.moveToNext()) {
             val seriesId: UUID =
-                UUID.fromString(result.getString(result.getColumnIndex("series_id")))
+                UUID.fromString(result.getString(result.getColumnIndex("id")))
 
-            if (!allSeries.containsKey(seriesId)) {
-                val name: String = result.getString(result.getColumnIndex("name"))
-                allSeries[seriesId] = Series(seriesId, name)
+            val series: Series = allSeries[seriesId] ?: run {
+                Series(
+                    seriesId,
+                    result.getString(result.getColumnIndex("name"))
+                ).also { allSeries[seriesId] = it }
             }
 
-            val series: Series = allSeries[seriesId] ?: throw IllegalStateException()
+            result.getIntOrNull(result.getColumnIndex("number"))?.let { number ->
+                val title: String = result.getString(result.getColumnIndex("title"))
+                val availability: Availability =
+                    Availability.fromValue(result.getInt(result.getColumnIndex("availability")))
 
-            val number: Int = result.getInt(result.getColumnIndex("number"))
-            val title: String = result.getString(result.getColumnIndex("title"))
-            val availability: Availability =
-                Availability.fromValue(result.getInt(result.getColumnIndex("availability")))
+                series.comics.add(Comic(series, number, title, availability))
+            }
 
-            series.comics.add(Comic(series, number, title, availability))
         }
         result.close()
         return allSeries.values.toMutableList()
@@ -47,9 +51,10 @@ class SqliteSeriesDAO(val context: Context) : SeriesDAO {
     ): Series {
 
         val uuid: UUID = UUID.randomUUID()
-
-
         val series: Series = Series(uuid, name)
+
+        val seriesValues: ContentValues = seriesToContentValues(series)
+        database.insert("series", seriesValues)
 
         val comicsDAO: ComicsDAO = SqliteComicsDAO(context)
         for (i in 1..numberOfComics) {
@@ -57,9 +62,6 @@ class SqliteSeriesDAO(val context: Context) : SeriesDAO {
             series.comics.add(comic)
         }
 
-        val seriesValues: ContentValues = seriesToContentValues(series)
-
-        database.insert("series", seriesValues)
         return series
     }
 

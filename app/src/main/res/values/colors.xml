@@ -10,4 +10,5 @@
     <color name="comic_available">#4CAF50</color>
     <color name="comic_missing">#F44336</color>
     <color name="comic_booked">#FF9800</color>
+    <color name="submenu_icon">#89000000</color>
 </resources>

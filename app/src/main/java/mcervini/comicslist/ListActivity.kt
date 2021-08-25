@@ -1,17 +1,21 @@
 package mcervini.comicslist
 
 import android.app.Activity
+import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.ContextMenu
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.SearchView
+import android.view.View.GONE
+import android.view.View.VISIBLE
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.SortedList
 import kotlinx.android.synthetic.main.activity_list.*
 import mcervini.comicslist.adapters.SeriesListAdapter
@@ -33,6 +37,11 @@ class ListActivity : AppCompatActivity() {
     private lateinit var seriesListAdapter: SeriesListAdapter
     private lateinit var comicsDAO: SqliteComicsDAO
     private lateinit var dataUpdater: DataUpdater
+    private lateinit var searchView: SearchView
+    private lateinit var filter: SeriesListFilter
+
+    private var openSearchView: Boolean = false
+    private var missingOnly:Boolean = false
 
     private val executor: Executor = Executors.newSingleThreadExecutor()
     private var onFragmentResumeAction: (() -> Unit)? = null
@@ -47,9 +56,15 @@ class ListActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
 
+        intent.extras?.let {
+            openSearchView = it.getBoolean("search", false)
+            missingOnly = it.getBoolean("missingOnly",false)
+        }
+
         seriesDAO = SqliteSeriesDAO(applicationContext)
         comicsDAO = SqliteComicsDAO(applicationContext)
         list = seriesDAO.getAllSeries()
+        println(list.size)
 
         displayingList = SortedList(Series::class.java, sortedListCallback)
         seriesListAdapter = SeriesListAdapter(displayingList)
@@ -59,6 +74,8 @@ class ListActivity : AppCompatActivity() {
         dataUpdater = DataUpdater(seriesDAO, comicsDAO, list, displayingList)
         displayingList.addAll(list)
 
+        filter = SeriesListFilter(list, displayingList)
+
         addSeriesFAB.setOnClickListener {
             NewSeriesDialog(onNewSeriesEntered).show(supportFragmentManager, "NewSeries")
         }
@@ -67,11 +84,31 @@ class ListActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.list_menu, menu)
-        menu?.let {
-            val item = it.findItem(R.id.menu_search)
-            val searchView = item.actionView as SearchView
-            searchView.setOnQueryTextListener(queryTextListener)
+        searchView = (menu?.findItem(R.id.menu_search)
+            ?.actionView as SearchView).apply {
+            setOnQueryTextListener(queryTextListener)
+            setOnSearchClickListener {
+                addSeriesFAB.visibility = GONE
+            }
+
+            setOnCloseListener {
+                filter.clearNameFilter()
+                addSeriesFAB.visibility = VISIBLE
+                false
+            }
+            if (openSearchView) {
+                isIconified = false
+            }
         }
+
+        if(missingOnly)
+        {
+            menu.findItem(R.id.menu_show_available).isChecked = false
+            menu.findItem(R.id.menu_show_booked).isChecked = false
+            filter.excludeAvailable(true)
+            filter.excludeBooked(true)
+        }
+
         return true
     }
 
@@ -104,6 +141,18 @@ class ListActivity : AppCompatActivity() {
                 }
                 startActivityForResult(intent, IMPORT_BACKUP)
             }
+            R.id.menu_show_available -> {
+                item.isChecked = !item.isChecked
+                filter.excludeAvailable(!item.isChecked)
+            }
+            R.id.menu_show_booked -> {
+                item.isChecked = !item.isChecked
+                filter.excludeBooked(!item.isChecked)
+            }
+            R.id.menu_show_not_available -> {
+                item.isChecked = !item.isChecked
+                filter.excludeNotAvailable(!item.isChecked)
+            }
         }
         return true
     }
@@ -111,42 +160,91 @@ class ListActivity : AppCompatActivity() {
     override fun onContextItemSelected(item: MenuItem): Boolean {
         val info = item.menuInfo as SeriesRecyclerView.ContextMenuInfo
 
-        val series: Series = displayingList[info.position]
-
-        val comic: Comic? = if (info.nestedPosition != -1) {
-            series.comics[info.nestedPosition]
+        val displayingSeries: Series = displayingList[info.position]
+        val series: Series = if (filter.isFiltering) {
+            filter.getSeries(displayingSeries.id)
         } else {
-            null
+            displayingSeries
+        }
+
+        val comic: Comic? = displayingSeries.comics.getOrNull(info.nestedPosition)
+
+
+        fun deleteComic() {
+            dataUpdater.deleteComic(comic!!)
+            if (displayingSeries !== series) {
+                displayingSeries.comics.remove(comic)
+                displayingList.updateItemAt(
+                    displayingList.indexOf(displayingSeries),
+                    displayingSeries
+                )
+            }
+        }
+
+        fun deleteSeries() {
+            dataUpdater.deleteSeries(series)
+            if (displayingSeries !== series) {
+                displayingList.remove(displayingSeries)
+            }
+        }
+
+        fun updateSeries(newName: String) {
+            onEditSeriesConfirm(series, newName)
+            if (displayingSeries !== series) {
+                displayingSeries.name = newName
+                displayingList.updateItemAt(
+                    displayingList.indexOf(displayingSeries),
+                    displayingSeries
+                )
+            }
+        }
+
+        fun updateComic(
+            title: String,
+            number: Int,
+            availability: Availability,
+            numberChanged: Boolean
+        ) {
+            onEditComicConfirm(comic!!, title, number, availability, numberChanged)
+            if (displayingSeries !== series) {
+                displayingList.updateItemAt(
+                    displayingList.indexOf(displayingSeries),
+                    displayingSeries
+                )
+            }
+
+        }
+
+        fun insertComic(number: Int, title: String, availability: Availability) {
+            val c = dataUpdater.createComic(series, number, title, availability)
+            if (displayingSeries !== series) {
+                displayingSeries.comics.add(c)
+                displayingSeries.comics.sort()
+                displayingList.updateItemAt(
+                    displayingList.indexOf(displayingSeries),
+                    displayingSeries
+                )
+            }
         }
 
         when (item.itemId) {
             R.id.menu_delete -> {
-                makeDeleteDialog(comic != null) {
-                    if (comic != null) {
-                        dataUpdater.deleteComic(comic)
-                    } else {
-                        dataUpdater.deleteSeries(series)
-                    }
-                }.show()
+                comic?.run { DeleteDialog(R.string.delete_comic_question) { deleteComic() } }
+                    ?: run { DeleteDialog(R.string.delete_series_question) { deleteSeries() } }
             }
-
             R.id.menu_edit -> {
-                if (comic == null) {
-                    EditSeriesDialog(series) { newName: String ->
-                        onEditSeriesConfirm(series, newName)
-                    }.show(supportFragmentManager, "editDialog")
-                } else {
+                comic?.run {
                     EditComicDialog(comic) { title: String, number: Int, availability: Availability, numberChanged: Boolean ->
-                        onEditComicConfirm(comic, title, number, availability, numberChanged)
-                    }.show(supportFragmentManager, "editDialog")
-                }
+                        updateComic(title, number, availability, numberChanged)
+                    }
+                } ?: run { EditSeriesDialog(series) { newName: String -> updateSeries(newName) } }
             }
-
             R.id.menu_new_comic ->
                 NewComicDialog(series) { number: Int, title: String, availability: Availability ->
-                    dataUpdater.createComic(series, number, title, availability)
-                }.show(supportFragmentManager, "newComic")
-        }
+                    insertComic(number, title, availability)
+                }
+            else -> null
+        }?.show(supportFragmentManager, "contextOptionDialog")
         return true
     }
 
@@ -230,29 +328,14 @@ class ListActivity : AppCompatActivity() {
         ).run()
     }
 
-    private fun makeDeleteDialog(comic: Boolean, onConfirm: () -> Unit): AlertDialog {
-        return AlertDialog.Builder(this)
-            .setTitle(getString(R.string.delete))
-            .setMessage(
-                if (comic) {
-                    R.string.delete_comic_question
-                } else {
-                    R.string.delete_series_question
-                }
-            )
-            .setNegativeButton(R.string.no) { dialog, _ -> dialog.dismiss() }
-            .setPositiveButton(R.string.yes) { _, _ -> onConfirm() }
-            .create()
-    }
-
     private val queryTextListener = object : SearchView.OnQueryTextListener {
-        override fun onQueryTextSubmit(p0: String?): Boolean {
-            Log.e("submit", p0 ?: "")
+        override fun onQueryTextSubmit(query: String?): Boolean {
+            filter.filterByName(query?:"")
             return false
         }
 
         override fun onQueryTextChange(query: String?): Boolean {
-            Log.e("change", query ?: "")
+            filter.filterByName(query?:"")
             return false
         }
     }

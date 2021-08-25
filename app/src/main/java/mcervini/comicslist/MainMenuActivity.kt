@@ -11,8 +11,19 @@ class MainMenuActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main_menu)
 
         viewComicsButton.setOnClickListener {
-            val intent: Intent = Intent(this, ListActivity::class.java);
-            startActivity(intent)
+            startActivity(Intent(this, ListActivity::class.java))
+        }
+
+        searchButton.setOnClickListener {
+            startActivity(Intent(this, ListActivity::class.java).apply {
+                putExtra("search", true)
+            })
+        }
+
+        missingListButton.setOnClickListener {
+            startActivity(Intent(this, ListActivity::class.java).apply {
+                putExtra("missingOnly", true)
+            })
         }
     }
 }

@@ -21,7 +21,6 @@ data class Series(
     override fun hashCode(): Int {
         var result = id.hashCode()
         result = 31 * result + name.hashCode()
-        result = 31 * result + comics.hashCode()
         return result
     }
 
