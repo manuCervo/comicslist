@@ -30,13 +30,18 @@ class NewComicDialog(
             return false
         }
 
-        val number: Int = numberEditText.text.toString().toInt()
-        for (c in series.comics) {
-            if (c.number == number) {
-                numberEditText.error = getString(R.string.comic_number_already_used)
-                return false
+        try {
+            val number: Int = numberEditText.text.toString().toInt()
+            for (c in series.comics) {
+                if (c.number == number) {
+                    numberEditText.error = getString(R.string.comic_number_already_used)
+                    return false
+                }
             }
+            return true
+        } catch (e: NumberFormatException) {
+            numberEditText.error = getString(R.string.invalid_number_error)
+            return false
         }
-        return true
     }
 }

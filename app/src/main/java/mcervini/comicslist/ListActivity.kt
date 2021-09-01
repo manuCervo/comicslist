@@ -1,7 +1,6 @@
 package mcervini.comicslist
 
 import android.app.Activity
-import android.app.Dialog
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -11,11 +10,10 @@ import android.view.MenuItem
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import androidx.annotation.StringRes
-import androidx.appcompat.app.AlertDialog
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SearchView
-import androidx.fragment.app.DialogFragment
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.SortedList
 import kotlinx.android.synthetic.main.activity_list.*
 import mcervini.comicslist.adapters.SeriesListAdapter
@@ -41,7 +39,7 @@ class ListActivity : AppCompatActivity() {
     private lateinit var filter: SeriesListFilter
 
     private var openSearchView: Boolean = false
-    private var missingOnly:Boolean = false
+    private var missingOnly: Boolean = false
 
     private val executor: Executor = Executors.newSingleThreadExecutor()
     private var onFragmentResumeAction: (() -> Unit)? = null
@@ -58,7 +56,7 @@ class ListActivity : AppCompatActivity() {
 
         intent.extras?.let {
             openSearchView = it.getBoolean("search", false)
-            missingOnly = it.getBoolean("missingOnly",false)
+            missingOnly = it.getBoolean("missingOnly", false)
         }
 
         seriesDAO = SqliteSeriesDAO(applicationContext)
@@ -69,6 +67,12 @@ class ListActivity : AppCompatActivity() {
         displayingList = SortedList(Series::class.java, sortedListCallback)
         seriesListAdapter = SeriesListAdapter(displayingList)
         comicsRecyclerView.adapter = seriesListAdapter
+        comicsRecyclerView.addItemDecoration(
+            DividerItemDecoration(
+                applicationContext,
+                LinearLayout.VERTICAL
+            )
+        )
         registerForContextMenu(comicsRecyclerView)
 
         dataUpdater = DataUpdater(seriesDAO, comicsDAO, list, displayingList)
@@ -99,10 +103,10 @@ class ListActivity : AppCompatActivity() {
             if (openSearchView) {
                 isIconified = false
             }
+
         }
 
-        if(missingOnly)
-        {
+        if (missingOnly) {
             menu.findItem(R.id.menu_show_available).isChecked = false
             menu.findItem(R.id.menu_show_booked).isChecked = false
             filter.excludeAvailable(true)
@@ -125,6 +129,21 @@ class ListActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+        fun keepMenuOpen(item: MenuItem) {
+            item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW)
+            item.actionView = View(this)
+            item.setOnActionExpandListener(object : MenuItem.OnActionExpandListener {
+                override fun onMenuItemActionExpand(item: MenuItem): Boolean {
+                    return false
+                }
+
+                override fun onMenuItemActionCollapse(item: MenuItem): Boolean {
+                    return false
+                }
+            })
+        }
+
         when (item.itemId) {
             R.id.menu_make_backup -> {
                 val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
@@ -144,14 +163,20 @@ class ListActivity : AppCompatActivity() {
             R.id.menu_show_available -> {
                 item.isChecked = !item.isChecked
                 filter.excludeAvailable(!item.isChecked)
+                keepMenuOpen(item)
+                return false
             }
             R.id.menu_show_booked -> {
                 item.isChecked = !item.isChecked
                 filter.excludeBooked(!item.isChecked)
+                keepMenuOpen(item)
+                return false
             }
             R.id.menu_show_not_available -> {
                 item.isChecked = !item.isChecked
                 filter.excludeNotAvailable(!item.isChecked)
+                keepMenuOpen(item)
+                return false
             }
         }
         return true
@@ -330,12 +355,12 @@ class ListActivity : AppCompatActivity() {
 
     private val queryTextListener = object : SearchView.OnQueryTextListener {
         override fun onQueryTextSubmit(query: String?): Boolean {
-            filter.filterByName(query?:"")
+            filter.filterByName(query ?: "")
             return false
         }
 
         override fun onQueryTextChange(query: String?): Boolean {
-            filter.filterByName(query?:"")
+            filter.filterByName(query ?: "")
             return false
         }
     }

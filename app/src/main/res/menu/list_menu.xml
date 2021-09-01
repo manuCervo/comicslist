@@ -5,7 +5,7 @@
 
     <item
         android:id="@+id/menu_search"
-        android:icon="@drawable/ic_search_black_24dp"
+        android:icon="@drawable/ic_search"
         android:title="@string/search"
         app:actionLayout="@layout/search_view"
         app:showAsAction="ifRoom" />
@@ -13,19 +13,36 @@
         <menu>
             <item
                 android:id="@+id/menu_import_backup"
-                android:icon="@drawable/ic_round_folder_open_24"
+                android:icon="@drawable/ic_open"
                 android:title="@string/import_backup" />
             <item
                 android:id="@+id/menu_make_backup"
-                android:icon="@drawable/ic_round_sd_storage_24"
+                android:icon="@drawable/ic_save"
                 android:title="@string/make_backup" />
         </menu>
     </item>
-    <item android:title="@string/show" app:showAsAction="never">
+    <item
+        android:title="@string/show"
+        app:showAsAction="never">
         <menu>
-            <item android:id="@+id/menu_show_available" android:title="@string/available" android:checkable="true" android:checked="true" android:icon="@drawable/menu_icon_available"/>
-            <item android:id="@+id/menu_show_not_available" android:title="@string/not_available" android:checkable="true" android:checked="true" android:icon="@drawable/menu_icon_not_available"/>
-            <item android:id="@+id/menu_show_booked" android:title="@string/booked" android:checkable="true" android:checked="true" android:icon="@drawable/menu_icon_booked"/>
+            <item
+                android:id="@+id/menu_show_available"
+                android:title="@string/available"
+                android:checkable="true"
+                android:checked="true"
+                android:icon="@drawable/menu_icon_available" />
+            <item
+                android:id="@+id/menu_show_not_available"
+                android:title="@string/not_available"
+                android:checkable="true"
+                android:checked="true"
+                android:icon="@drawable/menu_icon_not_available" />
+            <item
+                android:id="@+id/menu_show_booked"
+                android:title="@string/booked"
+                android:checkable="true"
+                android:checked="true"
+                android:icon="@drawable/menu_icon_booked" />
         </menu>
     </item>
 </menu>

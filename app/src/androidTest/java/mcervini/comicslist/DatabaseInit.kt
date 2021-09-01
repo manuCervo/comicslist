@@ -53,13 +53,12 @@ class DatabaseInit {
         }
 
     }
+
     @Test
-    fun lotsOfSeries()
-    {
+    fun lotsOfSeries() {
         val seriesDAO: SqliteSeriesDAO = SqliteSeriesDAO(context)
-        for(i in 1..100)
-        {
-            seriesDAO.createNewSeries("series$i",20,Availability.AVAILABLE)
+        for (i in 1..1000) {
+            seriesDAO.createNewSeries("series$i", 20, Availability.AVAILABLE)
         }
     }
 }

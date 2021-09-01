@@ -7,7 +7,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import mcervini.comicslist.R
 
-class DeleteDialog(@StringRes private val title:Int,private val onConfirm:()->Unit) : DialogFragment() {
+class DeleteDialog(@StringRes private val title: Int, private val onConfirm: () -> Unit) :
+    DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             AlertDialog.Builder(it)

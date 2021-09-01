@@ -4,34 +4,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:padding="24dp"
     tools:context=".MainMenuActivity">
 
     <Button
         android:id="@+id/viewComicsButton"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:text="@string/view_list" />
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_list"
+        android:text="@string/view_list"
+        android:textAlignment="viewStart" />
 
-    <LinearLayout
+    <Button
+        android:id="@+id/searchButton"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_round_search_24"
+        android:text="@string/search"
+        android:textAlignment="viewStart" />
 
-        <Button
-            android:id="@+id/missingListButton"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="@string/view_missing" />
-
-        <Button
-            android:id="@+id/searchButton"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="@string/search" />
-    </LinearLayout>
+    <Button
+        android:id="@+id/missingListButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_missing"
+        android:text="@string/view_missing"
+        android:textAlignment="viewStart" />
 
 </LinearLayout>

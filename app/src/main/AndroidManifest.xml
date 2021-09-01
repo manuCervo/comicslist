@@ -10,7 +10,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Comicslist">
         <activity android:name=".ListActivity"></activity>
-        <activity android:name=".MainActivity" />
         <activity android:name=".MainMenuActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

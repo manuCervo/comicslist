@@ -21,7 +21,7 @@ class JsonTest {
     fun testWrite() {
 
         val file = File(context.getExternalFilesDir(null), "testWrite.json")
-        val uri:Uri = Uri.fromFile(file)
+        val uri: Uri = Uri.fromFile(file)
 
         val series1 = Series(UUID.fromString("9d03c7cd-fc09-485d-8c7d-8531cc9b7e89"), "series1")
         for (i in 1..3) {
@@ -37,25 +37,27 @@ class JsonTest {
 
         val series: MutableList<Series> = mutableListOf(series1, series2, series3)
 
-        val jsonExporter = JsonExporter(uri,context.contentResolver)
+        val jsonExporter = JsonExporter(uri, context.contentResolver)
 
         jsonExporter.export(series)
 
         val fileReader = FileReader(file)
         val content: String = fileReader.readText()
         fileReader.close()
-        val expected: String = "[{\"id\":\"9d03c7cd-fc09-485d-8c7d-8531cc9b7e89\",\"name\":\"series1\",\"comics\":[{\"number\":1,\"title\":\"\",\"availability\":0},{\"number\":2,\"title\":\"\",\"availability\":1},{\"number\":3,\"title\":\"\",\"availability\":2}]},{\"id\":\"ed7ff5a8-8dab-44c7-9cab-9d080c0a75f4\",\"name\":\"series2\",\"comics\":[{\"number\":1,\"title\":\"comic1\",\"availability\":0},{\"number\":2,\"title\":\"comic2\",\"availability\":1},{\"number\":3,\"title\":\"comic3\",\"availability\":2}]},{\"id\":\"1f931bbc-3b6b-480b-bfa9-6894120e9744\",\"name\":\"series3\",\"comics\":[]}]"
+        val expected: String =
+            "[{\"id\":\"9d03c7cd-fc09-485d-8c7d-8531cc9b7e89\",\"name\":\"series1\",\"comics\":[{\"number\":1,\"title\":\"\",\"availability\":0},{\"number\":2,\"title\":\"\",\"availability\":1},{\"number\":3,\"title\":\"\",\"availability\":2}]},{\"id\":\"ed7ff5a8-8dab-44c7-9cab-9d080c0a75f4\",\"name\":\"series2\",\"comics\":[{\"number\":1,\"title\":\"comic1\",\"availability\":0},{\"number\":2,\"title\":\"comic2\",\"availability\":1},{\"number\":3,\"title\":\"comic3\",\"availability\":2}]},{\"id\":\"1f931bbc-3b6b-480b-bfa9-6894120e9744\",\"name\":\"series3\",\"comics\":[]}]"
         assert(content.equals(expected))
     }
 
     @Test
     fun testRead() {
-        val json: String = "[{\"id\":\"9d03c7cd-fc09-485d-8c7d-8531cc9b7e89\",\"name\":\"series1\",\"comics\":[{\"number\":1,\"title\":\"\",\"availability\":0},{\"number\":2,\"title\":\"\",\"availability\":1},{\"number\":3,\"title\":\"\",\"availability\":2}]},{\"id\":\"ed7ff5a8-8dab-44c7-9cab-9d080c0a75f4\",\"name\":\"series2\",\"comics\":[{\"number\":1,\"title\":\"comic1\",\"availability\":0},{\"number\":2,\"title\":\"comic2\",\"availability\":1},{\"number\":3,\"title\":\"comic3\",\"availability\":2}]},{\"id\":\"1f931bbc-3b6b-480b-bfa9-6894120e9744\",\"name\":\"series3\",\"comics\":[]}]"
+        val json: String =
+            "[{\"id\":\"9d03c7cd-fc09-485d-8c7d-8531cc9b7e89\",\"name\":\"series1\",\"comics\":[{\"number\":1,\"title\":\"\",\"availability\":0},{\"number\":2,\"title\":\"\",\"availability\":1},{\"number\":3,\"title\":\"\",\"availability\":2}]},{\"id\":\"ed7ff5a8-8dab-44c7-9cab-9d080c0a75f4\",\"name\":\"series2\",\"comics\":[{\"number\":1,\"title\":\"comic1\",\"availability\":0},{\"number\":2,\"title\":\"comic2\",\"availability\":1},{\"number\":3,\"title\":\"comic3\",\"availability\":2}]},{\"id\":\"1f931bbc-3b6b-480b-bfa9-6894120e9744\",\"name\":\"series3\",\"comics\":[]}]"
         val file: File = File(context.getExternalFilesDir(null), "testRead.json")
         val writer: FileWriter = FileWriter(file)
         writer.write(json)
         writer.close()
-        val jsonImporter: JsonImporter = JsonImporter(Uri.fromFile(file),context.contentResolver)
+        val jsonImporter: JsonImporter = JsonImporter(Uri.fromFile(file), context.contentResolver)
 
         val series: List<Series> = jsonImporter.import()
 

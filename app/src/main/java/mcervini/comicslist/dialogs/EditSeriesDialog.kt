@@ -3,7 +3,7 @@ package mcervini.comicslist.dialogs
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
-import android.text.InputType
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import androidx.core.widget.doOnTextChanged
@@ -15,16 +15,13 @@ class EditSeriesDialog(private val series: Series, val onConfirm: (String) -> Un
     DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
-            val editText: EditText = EditText(activity).apply {
-                setHint(R.string.name)
-                inputType = InputType.TYPE_CLASS_TEXT
-                maxLines = 1
-                setText(series.name)
-            }
+            val view: View = it.layoutInflater.inflate(R.layout.edit_series_dialog, null)
+            val editText: EditText = view.findViewById(R.id.seriesNameEditText)
+            editText.setText(series.name)
 
             val dialog = AlertDialog.Builder(activity)
                 .setTitle(R.string.edit_series)
-                .setView(editText)
+                .setView(view)
                 .setNegativeButton(R.string.cancel) { dialog, which -> dialog.dismiss() }
                 .setPositiveButton(R.string.ok) { dialog, which ->
                     val newName: String = editText.text.toString()
