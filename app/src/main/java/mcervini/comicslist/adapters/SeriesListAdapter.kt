@@ -31,18 +31,22 @@ class SeriesListAdapter(private val list: SortedList<Series>) :
 
     override fun onBindViewHolder(holder: SeriesViewHolder, position: Int) {
         val series: Series = list[position]
+        val collapse =
+            collapsedSeries[series.id] ?: false.also { collapsedSeries[series.id] = false }
 
-        holder.onCollapseChange = { collapsed ->
-            collapsedSeries[series.id] = collapsed
+        with(holder)
+        {
+            seriesNameTextView.text = series.name
+            comicsRecyclerView.adapter = ComicsListAdapter(series.comics)
+            resetForBinding(collapse)
+
+            onCollapseChange = { collapsed ->
+                collapsedSeries[series.id] = collapsed
+            }
         }
-
-        holder.collapsed = collapsedSeries[series.id] ?: false
-        holder.seriesNameTextView.text = series.name
-        holder.comicsRecyclerView.adapter = ComicsListAdapter(series.comics)
     }
 
-
-    class SeriesViewHolder(view: View) :
+    class SeriesViewHolder(private val view: View) :
         RecyclerView.ViewHolder(view) {
         val seriesNameTextView: TextView = view.findViewById(R.id.seriesNameTextView)
         val comicsRecyclerView: RecyclerView = view.findViewById(R.id.comicsRecyclerView)
@@ -50,34 +54,40 @@ class SeriesListAdapter(private val list: SortedList<Series>) :
         private val animationDuration =
             view.context.resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
 
-        lateinit var onCollapseChange: (Boolean) -> Unit
 
-        var collapsed = false
-            set(value) {
-                field = value
-                onCollapseChange(value)
+        var onCollapseChange: (Boolean) -> Unit = {}
 
-                comicsRecyclerView.visibility = if (value) {
-                    GONE
-                } else {
-                    VISIBLE
-                }
+        private var collapsed = false
 
-                val rotation = if (value) {
-                    -90f
-                } else {
-                    0f
-                }
-
-                expandButton.animate()
-                    .rotation(rotation)
-                    .setDuration(animationDuration)
-                    .start()
-            }
 
         init {
             view.isLongClickable = true
-            expandButton.setOnClickListener { collapsed = !collapsed }
+            expandButton.setOnClickListener {
+                collapsed = !collapsed
+                onCollapseChange(collapsed)
+                val rotation = if (collapsed) {
+                    comicsRecyclerView.visibility = GONE
+                    -90f
+                } else {
+                    comicsRecyclerView.visibility = VISIBLE
+                    0f
+                }
+                expandButton.animate()
+                    .rotation(rotation)
+                    .setDuration(animationDuration)
+            }
         }
+
+        fun resetForBinding(collapse: Boolean) {
+            expandButton.rotation = if (collapse) {
+                comicsRecyclerView.visibility = GONE
+                -90f
+            } else {
+                comicsRecyclerView.visibility = VISIBLE
+                0f
+            }
+            collapsed = collapse
+        }
+
     }
 }

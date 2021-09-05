@@ -23,4 +23,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/delete_everything_and_replace_with_backup" />
+
+    <RadioButton
+        android:id="@+id/keepBothRadioButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/keep_both" />
 </RadioGroup>

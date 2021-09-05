@@ -13,15 +13,17 @@
         android:layout_height="wrap_content"
         android:drawableLeft="@drawable/ic_list"
         android:text="@string/view_list"
-        android:textAlignment="viewStart" />
+        android:textAlignment="viewStart"
+        android:textSize="20sp" />
 
     <Button
         android:id="@+id/searchButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:drawableLeft="@drawable/ic_round_search_24"
+        android:drawableLeft="@drawable/ic_main_menu_search"
         android:text="@string/search"
-        android:textAlignment="viewStart" />
+        android:textAlignment="viewStart"
+        android:textSize="20sp" />
 
     <Button
         android:id="@+id/missingListButton"
@@ -29,6 +31,7 @@
         android:layout_height="wrap_content"
         android:drawableLeft="@drawable/ic_missing"
         android:text="@string/view_missing"
-        android:textAlignment="viewStart" />
+        android:textAlignment="viewStart"
+        android:textSize="20sp" />
 
 </LinearLayout>

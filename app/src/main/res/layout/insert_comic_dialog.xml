@@ -19,14 +19,12 @@
             android:layout_height="wrap_content"
             android:hint="@string/number"
             android:inputType="number"
-            android:maxWidth="90sp"
-            android:minWidth="90sp"
             android:minHeight="48dp"
-            android:minEms="2"
             app:layout_constraintEnd_toStartOf="@+id/comicTitleEditText"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:maxEms="4" />
 
         <EditText
             android:id="@+id/comicTitleEditText"

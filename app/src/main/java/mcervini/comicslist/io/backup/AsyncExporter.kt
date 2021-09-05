@@ -33,7 +33,7 @@ class AsyncExporter(
         activity.runOnUiThread {
             Toast.makeText(
                 activity.applicationContext,
-                R.string.comics_exported, Toast.LENGTH_SHORT
+                R.string.export_complete, Toast.LENGTH_SHORT
             ).show()
         }
     }

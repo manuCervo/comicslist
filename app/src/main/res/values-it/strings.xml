@@ -27,4 +27,18 @@
     <string name="edit">modifica</string>
     <string name="make_backup">crea backup</string>
     <string name="import_backup">importa backup</string>
+    <string name="export_complete">backup completato</string>
+    <string name="creating_backup">creazione backup...</string>
+    <string name="importing_backup">importazione backup...</string>
+    <string name="overwrite_existing">sovrascrivi le serie che sono già nella lista</string>
+    <string name="keep_existing">ignora le serie che sono già nella lista</string>
+    <string name="cant_read_file">impossibile leggere il file</string>
+    <string name="import_missing_data">il file contiene dati mancanti</string>
+    <string name="import_error_generic">si è verificato un errore durante l\'importazione</string>
+    <string name="cant_write_file">si è verificato un errore durante la scrittura nel file</string>
+    <string name="delete_everything_and_replace_with_backup">elimina tutto e sostituisci col backup</string>
+    <string name="show">mostra</string>
+    <string name="invalid_number_error">numero non valido</string>
+    <string name="import_options_info">La lista non è vuota. Come vuoi importare il backup?</string>
+    <string name="keep_both">mantieni sia le serie nella lista che quelle nel backup</string>
 </resources>

@@ -17,11 +17,15 @@ class ProgressDialog(@StringRes private val title: Int) : DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
 
+            isCancelable = false
+
             val view: View = it.layoutInflater.inflate(R.layout.progress_dialog, null)
 
             progressBar = view.findViewById<ProgressBar>(R.id.progressBar).apply {
                 isIndeterminate = true
             }
+
+
 
             AlertDialog.Builder(requireContext())
                 .setView(view)

@@ -29,16 +29,18 @@
     <string name="edit">edit</string>
     <string name="make_backup">create backup</string>
     <string name="import_backup">import backup</string>
-    <string name="comics_exported">comics exported</string>
+    <string name="export_complete">backup completed</string>
     <string name="creating_backup">creating backup…</string>
     <string name="importing_backup">importing backup…</string>
-    <string name="overwrite_existing">overwrite existing</string>
-    <string name="keep_existing">keep existing</string>
+    <string name="overwrite_existing">overwrite the series that are already in the list</string>
+    <string name="keep_existing">ignore the series that are already in the list</string>
     <string name="cant_read_file">can\'t read file</string>
     <string name="import_missing_data">the file has missing data</string>
-    <string name="import_error_generic">an error occured while importing</string>
-    <string name="cant_write_file">an error occured while writing to file</string>
+    <string name="import_error_generic">an error occurred while importing</string>
+    <string name="cant_write_file">an error occurred while writing to file</string>
     <string name="delete_everything_and_replace_with_backup">delete everything and replace with backup</string>
     <string name="show">show</string>
     <string name="invalid_number_error">invalid number</string>
+    <string name="import_options_info">The list is not empty. How do you want to import the backup?</string>
+    <string name="keep_both">keep both the existing series and the ones in the backup</string>
 </resources>

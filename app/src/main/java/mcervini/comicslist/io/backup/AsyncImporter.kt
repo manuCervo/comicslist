@@ -62,9 +62,10 @@ class AsyncImporter(
         }
 
         when (mode) {
-            ImportMode.OVERWRITE -> overWriteExisting(imported)
+            ImportMode.OVERWRITE -> overwriteExisting(imported)
             ImportMode.KEEP -> keepExisting(imported)
             ImportMode.REPLACE -> replace(imported)
+            ImportMode.KEEP_BOTH -> keepBoth(imported)
         }
         activity.runOnUiThread {
             displayingList.beginBatchedUpdates()
@@ -94,6 +95,32 @@ class AsyncImporter(
         return Pair(currentSeries, currentComics)
     }
 
+    private fun keepBoth(imported: List<Series>) {
+        val (currentSeries, currentComics) = listToMaps()
+
+        for ((progress, s) in imported.withIndex()) {
+
+            val seriesId: UUID = s.id
+            val series: Series? = currentSeries[seriesId]
+
+            if (series != null) {
+                val newSeries = s.copy(id = UUID.randomUUID(), comics = mutableListOf())
+                seriesDAO.addExistingSeries(newSeries)
+                for (c in s.comics) {
+                    val newComic = c.copy(series = newSeries)
+                    comicsDAO.addExistingComic(newComic)
+                }
+            } else {
+                seriesDAO.addExistingSeries(s)
+                list.add(s)
+                for (c in s.comics) {
+                    comicsDAO.addExistingComic(c)
+                }
+            }
+            updateProgress(progress)
+        }
+    }
+
     private fun keepExisting(imported: List<Series>) {
         val (currentSeries, currentComics) = listToMaps()
 
@@ -121,10 +148,9 @@ class AsyncImporter(
 
             updateProgress(progress)
         }
-
     }
 
-    private fun overWriteExisting(imported: List<Series>) {
+    private fun overwriteExisting(imported: List<Series>) {
         val (currentSeries, currentComics) = listToMaps()
         for ((progress, s) in imported.withIndex()) {
             val seriesId: UUID = s.id
@@ -181,7 +207,8 @@ class AsyncImporter(
     enum class ImportMode {
         OVERWRITE,
         KEEP,
-        REPLACE
+        REPLACE,
+        KEEP_BOTH
     }
 }
 

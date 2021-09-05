@@ -23,6 +23,7 @@ class ImportOptionsDialog(private val onConfirm: (AsyncImporter.ImportMode) -> U
             AlertDialog.Builder(requireActivity())
                 .setTitle(R.string.import_backup)
                 .setView(view)
+                .setMessage(R.string.import_options_info)
                 .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
                 .setPositiveButton(R.string.ok) { _, _ ->
                     onConfirm(
@@ -30,6 +31,7 @@ class ImportOptionsDialog(private val onConfirm: (AsyncImporter.ImportMode) -> U
                             R.id.keepRadioButton -> AsyncImporter.ImportMode.KEEP
                             R.id.overwriteRadioButton -> AsyncImporter.ImportMode.OVERWRITE
                             R.id.ReplaceRadioButton -> AsyncImporter.ImportMode.REPLACE
+                            R.id.keepBothRadioButton -> AsyncImporter.ImportMode.KEEP_BOTH
                             else -> throw IllegalStateException()
                         }
                     )
