@@ -54,9 +54,10 @@ class SeriesListFilter(
 
     fun filterByName(name: String) {
         activeFilters.add(this::searchByName)
-        if (searchQuery != name || !filteringByName) {
+        val search = name.trim().toLowerCase()
+        if (searchQuery != search || !filteringByName) {
             filteringByName = true
-            searchQuery = name
+            searchQuery = search
             updateList()
         }
     }
