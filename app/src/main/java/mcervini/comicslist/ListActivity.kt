@@ -35,7 +35,6 @@ class ListActivity : AppCompatActivity() {
     private lateinit var seriesListAdapter: SeriesListAdapter
     private lateinit var comicsDAO: SqliteComicsDAO
     private lateinit var dataUpdater: DataUpdater
-    private lateinit var searchView: SearchView
     private lateinit var filter: SeriesListFilter
 
     private var openSearchView: Boolean = false
@@ -88,7 +87,8 @@ class ListActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.list_menu, menu)
-        searchView = (menu?.findItem(R.id.menu_search)
+
+        (menu!!.findItem(R.id.menu_search)
             ?.actionView as SearchView).apply {
             setOnQueryTextListener(queryTextListener)
             setOnSearchClickListener {

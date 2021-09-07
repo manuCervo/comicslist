@@ -9,7 +9,9 @@
         android:title="@string/search"
         app:actionLayout="@layout/search_view"
         app:showAsAction="ifRoom" />
-    <item android:title="@string/backup">
+    <item
+        android:id="@+id/menu_backup"
+        android:title="@string/backup">
         <menu>
             <item
                 android:id="@+id/menu_import_backup"
@@ -22,27 +24,28 @@
         </menu>
     </item>
     <item
+        android:id="@+id/menu_show"
         android:title="@string/show"
         app:showAsAction="never">
         <menu>
             <item
                 android:id="@+id/menu_show_available"
-                android:title="@string/available"
                 android:checkable="true"
                 android:checked="true"
-                android:icon="@drawable/menu_icon_available" />
+                android:icon="@drawable/menu_icon_available"
+                android:title="@string/available" />
             <item
                 android:id="@+id/menu_show_not_available"
-                android:title="@string/not_available"
                 android:checkable="true"
                 android:checked="true"
-                android:icon="@drawable/menu_icon_not_available" />
+                android:icon="@drawable/menu_icon_not_available"
+                android:title="@string/not_available" />
             <item
                 android:id="@+id/menu_show_booked"
-                android:title="@string/booked"
                 android:checkable="true"
                 android:checked="true"
-                android:icon="@drawable/menu_icon_booked" />
+                android:icon="@drawable/menu_icon_booked"
+                android:title="@string/booked" />
         </menu>
     </item>
 </menu>

@@ -109,7 +109,9 @@ class AsyncImporter(
                 for (c in s.comics) {
                     val newComic = c.copy(series = newSeries)
                     comicsDAO.addExistingComic(newComic)
+                    newSeries.comics.add(newComic)
                 }
+                list.add(newSeries)
             } else {
                 seriesDAO.addExistingSeries(s)
                 list.add(s)
