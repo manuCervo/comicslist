@@ -1,5 +1,8 @@
 package mcervini.comicslist.io.backup
 
+/**
+ * name of the keys for json importing/exporting
+ */
 class JsonKeys {
     companion object {
         const val SERIES_ID = "id"

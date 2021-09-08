@@ -13,6 +13,10 @@ import mcervini.comicslist.Availability
 import mcervini.comicslist.R
 import mcervini.comicslist.adapters.AvailabilitySpinnerAdapter
 
+/**
+ * dialog for entering a new Series
+ * @param onConfirm called when the user confirms the insertion of the series. The arguments are the data entered by the user
+ */
 class NewSeriesDialog(private val onConfirm: (String, Int, Availability) -> Unit) :
     DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

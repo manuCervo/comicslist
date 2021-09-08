@@ -8,6 +8,11 @@ import androidx.fragment.app.DialogFragment
 import mcervini.comicslist.R
 import mcervini.comicslist.io.backup.AsyncImporter
 
+/**
+ * dialog for selecting the import mode for importing a backup
+ *
+ * @param onConfirm called when the user confirms the dialog. The argument is the selected import mode
+ */
 class ImportOptionsDialog(private val onConfirm: (AsyncImporter.ImportMode) -> Unit) :
     DialogFragment() {
 

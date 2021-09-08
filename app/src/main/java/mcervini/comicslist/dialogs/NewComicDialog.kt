@@ -4,6 +4,12 @@ import mcervini.comicslist.Availability
 import mcervini.comicslist.R
 import mcervini.comicslist.Series
 
+/**
+ * dialog for entering a new comic
+ *
+ * @param series the series where the user wants to add the new comic
+ * @param onConfirm called when the user confirms the dialog, the arguments are what the user entered
+ */
 class NewComicDialog(
     private val series: Series,
     private val onConfirm: (Int, String, Availability) -> Unit
@@ -14,7 +20,7 @@ class NewComicDialog(
     }
 
     override fun initializeView() {
-        var nextNumber: Int = 0
+        var nextNumber = 0
         for (c in series.comics) {
             if (c.number > nextNumber) {
                 nextNumber = c.number

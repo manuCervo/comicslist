@@ -10,6 +10,9 @@ import android.widget.TextView
 import mcervini.comicslist.Availability
 import mcervini.comicslist.R
 
+/**
+ * adapter for choosing the availability from a spinner
+ */
 class AvailabilitySpinnerAdapter(context: Context) : ArrayAdapter<Availability>(
     context,
     R.layout.listitem_availability_spinner,
@@ -22,7 +25,6 @@ class AvailabilitySpinnerAdapter(context: Context) : ArrayAdapter<Availability>(
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val item: Availability = items[position]
         val view: View = convertView ?: LayoutInflater.from(context).inflate(resource, null)
-
         val textView: TextView = view.findViewById(R.id.availabilitySpinnerTextView)
         val imageView: ImageView = view.findViewById(R.id.availabilitySpinnerImageView)
 

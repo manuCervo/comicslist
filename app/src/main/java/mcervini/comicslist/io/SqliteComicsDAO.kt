@@ -25,7 +25,7 @@ class SqliteComicsDAO(private val context: Context) : ComicsDAO {
         title: String,
         availability: Availability
     ): Comic {
-        val comic: Comic = Comic(series, number, title, availability)
+        val comic = Comic(series, number, title, availability)
         val values: ContentValues = comicToContentValues(comic)
         database.insert("comic", values)
         return comic

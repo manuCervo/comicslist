@@ -13,11 +13,17 @@ import mcervini.comicslist.io.backup.JsonKeys.Companion.SERIES_ID
 import mcervini.comicslist.io.backup.JsonKeys.Companion.SERIES_NAME
 import java.io.OutputStreamWriter
 
+/**
+ * exports a list of series in a json file
+ *
+ * @param uri the uri of the destination file
+ * @param contentResolver used for opening the file
+ */
 class JsonExporter(private val uri: Uri, private val contentResolver: ContentResolver) : Exporter {
 
 
     override fun export(series: List<Series>) {
-        val writer: JsonWriter =
+        val writer =
             JsonWriter(OutputStreamWriter(contentResolver.openOutputStream(uri)))
         writer.run {
             beginArray()

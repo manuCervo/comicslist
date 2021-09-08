@@ -3,11 +3,21 @@ package mcervini.comicslist
 import androidx.recyclerview.widget.SortedList
 import java.util.*
 
+/**
+ * class for filtering a list of series based on their name and on the title and the availability of their comics.
+ *
+ * @param list the full list containing all of the series
+ * @param displayList the list that will contain only the series that match the filters
+ */
 class SeriesListFilter(
     private val list: MutableList<Series>,
     private val displayList: SortedList<Series>
 ) {
     private val activeFilters: MutableSet<(Series) -> Series?> = mutableSetOf()
+
+    //since the list of comics in the series can't be modified (because it has to remain the same of what is in the database),
+    //a series can't be added directly to the displaying list, but a copy will be created.
+    //this map is for getting a series from the corresponding "fake" one in the displaying list
     private val displayingSeriesMap: MutableMap<UUID, Series> = mutableMapOf()
 
     private var searchQuery = ""
@@ -16,6 +26,16 @@ class SeriesListFilter(
     private var excludingBooked: Boolean = false
     private var filteringByName: Boolean = false
 
+    /**
+     * gets the corresponding series from the id of one that is currently shown
+     */
+    fun getSeries(id: UUID): Series {
+        return displayingSeriesMap[id]!!
+    }
+
+    /**
+     * enables or disables the exclusion of available comics
+     */
     fun excludeAvailable(exclude: Boolean) {
         if (exclude) {
             activeFilters.add(this::filterAvailable)
@@ -28,6 +48,9 @@ class SeriesListFilter(
         }
     }
 
+    /**
+     * enables or disables the exclusion of not available comics
+     */
     fun excludeNotAvailable(exclude: Boolean) {
         if (exclude) {
             activeFilters.add(this::filterNotAvailable)
@@ -40,6 +63,9 @@ class SeriesListFilter(
         }
     }
 
+    /**
+     * enables or disables the exclusion of not booked comics
+     */
     fun excludeBooked(exclude: Boolean) {
         if (exclude) {
             activeFilters.add(this::filterBooked)
@@ -52,16 +78,24 @@ class SeriesListFilter(
         }
     }
 
-    fun filterByName(name: String) {
+    /**
+     * enables the filtering by the search query passed as argument
+     * this filter will include in the result all the series that contain the search query or that have at least one comic with the title that includes the search query.
+     * if a comic has no title, it will be included if its series's title contains the search query
+     */
+    fun filterByName(searchQuery: String) {
         activeFilters.add(this::searchByName)
-        val search = name.trim().toLowerCase()
-        if (searchQuery != search || !filteringByName) {
+        val search = searchQuery.trim().toLowerCase()
+        if (this.searchQuery != search || !filteringByName) {
             filteringByName = true
-            searchQuery = search
+            this.searchQuery = search
             updateList()
         }
     }
 
+    /**
+     * disables the filtering by name
+     */
     fun clearNameFilter() {
         filteringByName = false
         searchQuery = ""
@@ -69,6 +103,9 @@ class SeriesListFilter(
         updateList()
     }
 
+    /**
+     * applies all the active filters
+     */
     private fun updateList() {
         var temp: List<Series> = list
         displayList.clear()
@@ -84,13 +121,9 @@ class SeriesListFilter(
         }
     }
 
-
     val isFiltering: Boolean
         get() = activeFilters.isNotEmpty()
 
-    fun getSeries(id: UUID): Series {
-        return displayingSeriesMap[id]!!
-    }
 
     private fun filterAvailable(s: Series): Series? {
         return excludeByAvailability(s, Availability.AVAILABLE)
@@ -139,3 +172,4 @@ class SeriesListFilter(
         return null
     }
 }
+

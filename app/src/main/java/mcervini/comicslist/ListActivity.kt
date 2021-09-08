@@ -27,23 +27,35 @@ import mcervini.comicslist.io.backup.JsonImporter
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 
+/**
+ * main activity of the application
+ */
 class ListActivity : AppCompatActivity() {
 
-    private lateinit var list: MutableList<Series>
+    //list of series that are currently stored in the database
+    private lateinit var databaseList: MutableList<Series>
+
+    //list of series that are currently shown
     private lateinit var displayingList: SortedList<Series>
+
     private lateinit var seriesDAO: SqliteSeriesDAO
     private lateinit var seriesListAdapter: SeriesListAdapter
     private lateinit var comicsDAO: SqliteComicsDAO
     private lateinit var dataUpdater: DataUpdater
     private lateinit var filter: SeriesListFilter
 
+
     private var openSearchView: Boolean = false
     private var missingOnly: Boolean = false
 
+    //executor for running background threads
     private val executor: Executor = Executors.newSingleThreadExecutor()
+
+    //used to show dialogs after the onActivityResult event
     private var onFragmentResumeAction: (() -> Unit)? = null
 
     companion object {
+        //request codes for intents
         private const val MAKE_BACKUP = 0
         private const val IMPORT_BACKUP = 1
     }
@@ -60,24 +72,24 @@ class ListActivity : AppCompatActivity() {
 
         seriesDAO = SqliteSeriesDAO(applicationContext)
         comicsDAO = SqliteComicsDAO(applicationContext)
-        list = seriesDAO.getAllSeries()
-        println(list.size)
+        databaseList = seriesDAO.getAllSeries()
+        println(databaseList.size)
 
         displayingList = SortedList(Series::class.java, sortedListCallback)
         seriesListAdapter = SeriesListAdapter(displayingList)
-        comicsRecyclerView.adapter = seriesListAdapter
-        comicsRecyclerView.addItemDecoration(
+        seriesRecyclerView.adapter = seriesListAdapter
+        seriesRecyclerView.addItemDecoration(
             DividerItemDecoration(
                 applicationContext,
                 LinearLayout.VERTICAL
             )
         )
-        registerForContextMenu(comicsRecyclerView)
+        registerForContextMenu(seriesRecyclerView)
 
-        dataUpdater = DataUpdater(seriesDAO, comicsDAO, list, displayingList)
-        displayingList.addAll(list)
+        dataUpdater = DataUpdater(seriesDAO, comicsDAO, databaseList, displayingList)
+        displayingList.addAll(databaseList)
 
-        filter = SeriesListFilter(list, displayingList)
+        filter = SeriesListFilter(databaseList, displayingList)
 
         addSeriesFAB.setOnClickListener {
             NewSeriesDialog(onNewSeriesEntered).show(supportFragmentManager, "NewSeries")
@@ -88,23 +100,24 @@ class ListActivity : AppCompatActivity() {
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.list_menu, menu)
 
-        (menu!!.findItem(R.id.menu_search)
-            ?.actionView as SearchView).apply {
-            setOnQueryTextListener(queryTextListener)
-            setOnSearchClickListener {
-                addSeriesFAB.visibility = GONE
-            }
+        val searchView = (menu!!.findItem(R.id.menu_search)!!.actionView as SearchView)
 
-            setOnCloseListener {
-                filter.clearNameFilter()
-                addSeriesFAB.visibility = VISIBLE
-                false
-            }
-            if (openSearchView) {
-                isIconified = false
-            }
+        searchView.setOnQueryTextListener(queryTextListener)
 
+        searchView.setOnSearchClickListener {
+            addSeriesFAB.visibility = GONE
         }
+
+        searchView.setOnCloseListener {
+            filter.clearNameFilter()
+            addSeriesFAB.visibility = VISIBLE
+            false
+        }
+
+        if (openSearchView) {
+            searchView.isIconified = false
+        }
+
 
         if (missingOnly) {
             menu.findItem(R.id.menu_show_available).isChecked = false
@@ -122,7 +135,9 @@ class ListActivity : AppCompatActivity() {
         menuInfo: ContextMenu.ContextMenuInfo?
     ) {
         val info = menuInfo as SeriesRecyclerView.ContextMenuInfo
+
         menuInflater.inflate(R.menu.modify_delete_context_menu, menu)
+
         if (info.nestedPosition == -1) {
             menuInflater.inflate(R.menu.series_context_menu, menu)
         }
@@ -130,6 +145,9 @@ class ListActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
+        /**
+         *forces a menuItem to not close after being touched by adding a fake action view to it
+         */
         fun keepMenuOpen(item: MenuItem) {
             item.setShowAsAction(MenuItem.SHOW_AS_ACTION_COLLAPSE_ACTION_VIEW)
             item.actionView = View(this)
@@ -186,6 +204,7 @@ class ListActivity : AppCompatActivity() {
         val info = item.menuInfo as SeriesRecyclerView.ContextMenuInfo
 
         val displayingSeries: Series = displayingList[info.position]
+
         val series: Series = if (filter.isFiltering) {
             filter.getSeries(displayingSeries.id)
         } else {
@@ -194,9 +213,9 @@ class ListActivity : AppCompatActivity() {
 
         val comic: Comic? = displayingSeries.comics.getOrNull(info.nestedPosition)
 
-
         fun deleteComic() {
             dataUpdater.deleteComic(comic!!)
+
             if (displayingSeries !== series) {
                 displayingSeries.comics.remove(comic)
                 displayingList.updateItemAt(
@@ -278,6 +297,7 @@ class ListActivity : AppCompatActivity() {
 
         if (resultCode == Activity.RESULT_OK) {
             intent?.data?.let { uri ->
+                //dialogFragments cannot be shown from here, so onFragmentResume action must be set to run in the onResumeFragment event
                 when (requestCode) {
                     MAKE_BACKUP -> onFragmentResumeAction = { makeBackup(uri) }
                     IMPORT_BACKUP -> onFragmentResumeAction = { importBackup(uri) }
@@ -294,10 +314,18 @@ class ListActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     *called when the user confirmed the insertion of a new series
+     */
+
     private val onNewSeriesEntered: (String, Int, Availability) -> Unit =
         { name, numberOfComics, availability ->
             dataUpdater.createSeries(name, numberOfComics, availability)
         }
+
+    /**
+     *called when the user confirmed the editing of a comic
+     */
 
     private fun onEditComicConfirm(
         comic: Comic,
@@ -314,10 +342,14 @@ class ListActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * called when the user confirmed the editing of a comic
+     */
     private fun onEditSeriesConfirm(series: Series, newName: String) {
         series.name = newName
         dataUpdater.updateSeries(series)
     }
+
 
     private fun importBackup(uri: Uri) {
         val importer = JsonImporter(uri, contentResolver)
@@ -329,13 +361,13 @@ class ListActivity : AppCompatActivity() {
                 importer,
                 seriesDAO,
                 comicsDAO,
-                list,
+                databaseList,
                 displayingList,
                 importMode
             ).run()
         }
 
-        if (list.size == 0) {
+        if (databaseList.size == 0) {
             startImporting()
         } else {
             ImportOptionsDialog { importMode ->
@@ -346,12 +378,16 @@ class ListActivity : AppCompatActivity() {
 
     private fun makeBackup(uri: Uri) {
         AsyncExporter(
-            list,
+            databaseList,
             JsonExporter(uri, contentResolver),
             this,
             executor
         ).run()
     }
+
+    /**
+     *listener for when the user uses the search bar
+     */
 
     private val queryTextListener = object : SearchView.OnQueryTextListener {
         override fun onQueryTextSubmit(query: String?): Boolean {
@@ -365,6 +401,7 @@ class ListActivity : AppCompatActivity() {
         }
     }
 
+    //callbacks for automatically update the items in the recyclcerView when the list of the displayed series is updated
     private val sortedListCallback = object : SortedList.Callback<Series>() {
         override fun compare(o1: Series?, o2: Series?): Int {
             if (o1 != null && o2 != null) {

@@ -2,6 +2,12 @@ package mcervini.comicslist
 
 import java.util.*
 
+/**
+ * class for representing a series. A series is a collection of comics
+ * @param id the unique id of the series
+ * @param name the name of the series
+ * @param comics the list of comics of this series
+ */
 data class Series(
     val id: UUID,
     var name: String,

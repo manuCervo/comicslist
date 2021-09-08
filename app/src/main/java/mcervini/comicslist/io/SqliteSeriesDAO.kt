@@ -17,7 +17,7 @@ class SqliteSeriesDAO(val context: Context) : SeriesDAO {
 
     override fun getAllSeries(): MutableList<Series> {
         val result: Cursor =
-            database.query("series LEFT JOIN comic ON comic.series_id = series.id", null, null)
+            database.select("series LEFT JOIN comic ON comic.series_id = series.id", null, null)
         val allSeries: MutableMap<UUID, Series> = mutableMapOf()
 
         while (result.moveToNext()) {

@@ -10,8 +10,14 @@ import androidx.recyclerview.widget.RecyclerView
 import mcervini.comicslist.Comic
 import mcervini.comicslist.R
 
+/**
+ * adapter for showing a list of comics in a recyclerView
+ *
+ * @param list the list of comics
+ */
 class ComicsListAdapter(private val list: MutableList<Comic>) :
     RecyclerView.Adapter<ComicsListAdapter.ComicsListViewHolder>() {
+
     private val resource = R.layout.listitem_comic
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ComicsListViewHolder {
         return ComicsListViewHolder(
@@ -40,6 +46,9 @@ class ComicsListAdapter(private val list: MutableList<Comic>) :
         return list.size
     }
 
+    /**
+     * view holder for the ComicsListAdapter
+     */
     class ComicsListViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         init {
             view.isLongClickable = true

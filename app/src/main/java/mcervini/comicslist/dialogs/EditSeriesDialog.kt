@@ -11,6 +11,12 @@ import androidx.fragment.app.DialogFragment
 import mcervini.comicslist.R
 import mcervini.comicslist.Series
 
+/**
+ * dialog for editing a series
+ *
+ * @param series the series to edit
+ * @param onConfirm the callback that is called when the user confirms the modifications. the argument is the series's name entered by the user
+ */
 class EditSeriesDialog(private val series: Series, val onConfirm: (String) -> Unit) :
     DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -22,8 +28,8 @@ class EditSeriesDialog(private val series: Series, val onConfirm: (String) -> Un
             val dialog = AlertDialog.Builder(activity)
                 .setTitle(R.string.edit_series)
                 .setView(view)
-                .setNegativeButton(R.string.cancel) { dialog, which -> dialog.dismiss() }
-                .setPositiveButton(R.string.ok) { dialog, which ->
+                .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.dismiss() }
+                .setPositiveButton(R.string.ok) { dialog, _ ->
                     val newName: String = editText.text.toString()
                     onConfirm(newName)
                     dialog.dismiss()

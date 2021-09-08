@@ -7,6 +7,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.DialogFragment
 import mcervini.comicslist.R
 
+/**
+ * dialog for asking for confirmation when deleting a series or a comic
+ *
+ * @param title the string resource for the title
+ * @param onConfirm called when the user presses the yes button
+ */
 class DeleteDialog(@StringRes private val title: Int, private val onConfirm: () -> Unit) :
     DialogFragment() {
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

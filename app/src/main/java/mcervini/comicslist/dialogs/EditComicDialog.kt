@@ -4,13 +4,18 @@ import mcervini.comicslist.Availability
 import mcervini.comicslist.Comic
 import mcervini.comicslist.R
 
+/**
+ * dialog for editing a comic
+ *
+ * @param currentData the comic to edit
+ * @param onConfirm called when the user confirms the editing
+ */
 class EditComicDialog(
     private val currentData: Comic,
     private val onConfirm: (String, Int, Availability, Boolean) -> Unit
 ) : InsertComicDialog(R.string.edit_comic) {
 
     override fun onDialogConfirmed(number: Int, title: String, availability: Availability) {
-
         val numberChanged = number != currentData.number
 
         if (title != currentData.title || availability != currentData.availability || numberChanged) {

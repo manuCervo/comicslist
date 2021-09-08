@@ -8,6 +8,13 @@ import mcervini.comicslist.Series
 import java.io.IOException
 import java.util.concurrent.Executor
 
+/**
+ * asynchronously exports a list of series, while showing a ProgressDialog
+ *
+ * @param series the list of series to be exported
+ * @param exporter the exporter to use for exporting
+ * @param executor an Executor used for running the exporting process in a background thread
+ */
 class AsyncExporter(
     private val series: MutableList<Series>,
     private val exporter: Exporter,

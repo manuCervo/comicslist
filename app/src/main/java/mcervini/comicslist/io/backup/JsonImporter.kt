@@ -15,12 +15,20 @@ import mcervini.comicslist.io.backup.JsonKeys.Companion.SERIES_NAME
 import java.io.InputStreamReader
 import java.util.*
 
+/**
+ * imports a list of series from a json file
+ *
+ * @param uri the uri of the source file
+ * @param contentResolver used for opening the file
+ */
 class JsonImporter(private val uri: Uri, private val contentResolver: ContentResolver) : Importer {
+
+    //class for temporary holding a comic's data
     private class ComicData(val number: Int, val title: String, val availability: Availability)
 
 
     override fun import(): List<Series> {
-        val reader: JsonReader = JsonReader(InputStreamReader(contentResolver.openInputStream(uri)))
+        val reader = JsonReader(InputStreamReader(contentResolver.openInputStream(uri)))
         val series: MutableList<Series> = mutableListOf()
 
         return reader.run {

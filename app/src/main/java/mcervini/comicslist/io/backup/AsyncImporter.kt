@@ -14,6 +14,18 @@ import java.io.IOException
 import java.util.*
 import java.util.concurrent.Executor
 
+
+/**
+ * asynchronously imports a list of series, while showing a ProgressDialog
+ *
+ * @param importer the importer to use for importing the series
+ * @param executor an Executor used for running the importing process in a background thread
+ * @param seriesDAO the DAO for adding the imported series
+ * @param comicsDAO the DAO for adding the imported comics
+ * @param list the list containing the current series
+ * @param displayingList the list containing the series that are currently shown
+ * @param mode the import mode
+ */
 class AsyncImporter(
     activity: AppCompatActivity,
     executor: Executor,
@@ -96,7 +108,7 @@ class AsyncImporter(
     }
 
     private fun keepBoth(imported: List<Series>) {
-        val (currentSeries, currentComics) = listToMaps()
+        val (currentSeries, _) = listToMaps()
 
         for ((progress, s) in imported.withIndex()) {
 
@@ -206,10 +218,29 @@ class AsyncImporter(
         }
     }
 
+    /**
+     * specifies how to merge the imported series with the existing ones
+     */
     enum class ImportMode {
+
+        /**
+         * if there is a series or a comic that is both in the backup and in the list, overwrite it with the one in the backup
+         */
         OVERWRITE,
+
+        /**
+         * if there is a series or a comic that is both in the backup and in the list, keep the one in the list
+         */
         KEEP,
+
+        /**
+         * delete everything in the list and import the backup
+         */
         REPLACE,
+
+        /**
+         * if there is a series that is both in the backup and in the list, import the series/comic with a different id
+         */
         KEEP_BOTH
     }
 }

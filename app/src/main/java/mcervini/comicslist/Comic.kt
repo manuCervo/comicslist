@@ -1,6 +1,13 @@
 package mcervini.comicslist
 
-
+/**
+ * class for representing a comic
+ *
+ * @param series the series where this comics belongs
+ * @param number the number of this comic
+ * @param title the title of this comic (can be empty)
+ * @param availability the availability of this comic
+ */
 data class Comic(
     val series: Series,
     var number: Int,
