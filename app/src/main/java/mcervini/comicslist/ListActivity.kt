@@ -44,10 +44,6 @@ class ListActivity : AppCompatActivity() {
     private lateinit var dataUpdater: DataUpdater
     private lateinit var filter: SeriesListFilter
 
-
-    private var openSearchView: Boolean = false
-    private var missingOnly: Boolean = false
-
     //executor for running background threads
     private val executor: Executor = Executors.newSingleThreadExecutor()
 
@@ -64,11 +60,6 @@ class ListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_list)
-
-        intent.extras?.let {
-            openSearchView = it.getBoolean("search", false)
-            missingOnly = it.getBoolean("missingOnly", false)
-        }
 
         seriesDAO = SqliteSeriesDAO(applicationContext)
         comicsDAO = SqliteComicsDAO(applicationContext)
@@ -112,18 +103,6 @@ class ListActivity : AppCompatActivity() {
             filter.clearNameFilter()
             addSeriesFAB.visibility = VISIBLE
             false
-        }
-
-        if (openSearchView) {
-            searchView.isIconified = false
-        }
-
-
-        if (missingOnly) {
-            menu.findItem(R.id.menu_show_available).isChecked = false
-            menu.findItem(R.id.menu_show_booked).isChecked = false
-            filter.excludeAvailable(true)
-            filter.excludeBooked(true)
         }
 
         return true
