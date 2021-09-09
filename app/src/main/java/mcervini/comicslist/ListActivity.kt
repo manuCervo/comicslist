@@ -194,7 +194,6 @@ class ListActivity : AppCompatActivity() {
 
         fun deleteComic() {
             dataUpdater.deleteComic(comic!!)
-
             if (displayingSeries !== series) {
                 displayingSeries.comics.remove(comic)
                 displayingList.updateItemAt(
@@ -212,7 +211,8 @@ class ListActivity : AppCompatActivity() {
         }
 
         fun updateSeries(newName: String) {
-            onEditSeriesConfirm(series, newName)
+            series.name = newName
+            dataUpdater.updateSeries(series)
             if (displayingSeries !== series) {
                 displayingSeries.name = newName
                 displayingList.updateItemAt(
@@ -228,7 +228,12 @@ class ListActivity : AppCompatActivity() {
             availability: Availability,
             numberChanged: Boolean
         ) {
-            onEditComicConfirm(comic!!, title, number, availability, numberChanged)
+            comic!!.availability = availability
+            comic.title = title
+            dataUpdater.updateComic(comic)
+            if (numberChanged) {
+                dataUpdater.updateComicNumber(comic, number)
+            }
             if (displayingSeries !== series) {
                 displayingList.updateItemAt(
                     displayingList.indexOf(displayingSeries),
@@ -301,33 +306,6 @@ class ListActivity : AppCompatActivity() {
         { name, numberOfComics, availability ->
             dataUpdater.createSeries(name, numberOfComics, availability)
         }
-
-    /**
-     *called when the user confirmed the editing of a comic
-     */
-
-    private fun onEditComicConfirm(
-        comic: Comic,
-        title: String,
-        number: Int,
-        availability: Availability,
-        numberChanged: Boolean
-    ) {
-        comic.availability = availability
-        comic.title = title
-        dataUpdater.updateComic(comic)
-        if (numberChanged) {
-            dataUpdater.updateComicNumber(comic, number)
-        }
-    }
-
-    /**
-     * called when the user confirmed the editing of a comic
-     */
-    private fun onEditSeriesConfirm(series: Series, newName: String) {
-        series.name = newName
-        dataUpdater.updateSeries(series)
-    }
 
 
     private fun importBackup(uri: Uri) {
